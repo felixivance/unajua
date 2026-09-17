@@ -1,0 +1,20 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "arial",
+        "createdAt": "2026-09-17T08:15:19.376Z",
+        "reason": "user confirmed DESIGN.md is stray/unrelated to this app, not a real design system to conform to"
+      },
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "createdAt": "2026-09-17T08:21:01.562Z",
+        "reason": "pre-existing globals.css fallback, unrelated to this session's homepage work; Arial isn't the AI-slop-font pattern this rule targets"
+      }
+    ]
+  }
+}
