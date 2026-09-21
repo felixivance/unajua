@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -44,11 +45,12 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4">
-      <h1 className="text-center text-2xl font-bold text-gray-900">Tambua Admin</h1>
+    <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+      <h1 className="text-center text-2xl font-bold text-stone-900">Tambua Admin</h1>
 
       {notAdminError && (
-        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-800">
           That account doesn&apos;t have admin access.
         </div>
       )}
@@ -58,41 +60,55 @@ export default function AdminLoginPage() {
           Account created. Ask the site owner to grant you admin access, then sign in.
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input
-            type="email"
-            placeholder="Email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="rounded-lg border border-gray-300 px-4 py-2"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            required
-            minLength={6}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="rounded-lg border border-gray-300 px-4 py-2"
-          />
-          {error && <div className="text-sm text-red-600">{error}</div>}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-stone-800">
+            Email
+            <input
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="rounded-lg border border-stone-300 px-4 py-2.5 text-stone-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+            />
+          </label>
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-stone-800">
+            Password
+            <input
+              type="password"
+              autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="rounded-lg border border-stone-300 px-4 py-2.5 text-stone-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+            />
+          </label>
+          {error && (
+            <p role="alert" className="text-sm text-red-700">
+              {error}
+            </p>
+          )}
           <button
             type="submit"
             disabled={loading}
-            className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white disabled:opacity-60"
+            className="min-h-11 cursor-pointer rounded-lg bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-800 disabled:opacity-60"
           >
             {mode === "sign-in" ? "Sign in" : "Create account"}
           </button>
           <button
             type="button"
             onClick={() => setMode(mode === "sign-in" ? "sign-up" : "sign-in")}
-            className="text-sm text-emerald-700 underline"
+            className="min-h-11 cursor-pointer text-sm text-emerald-800 underline"
           >
             {mode === "sign-in" ? "Need an account? Sign up" : "Already have an account? Sign in"}
           </button>
         </form>
       )}
+      <Link href="/" className="text-center text-sm text-stone-500 underline">
+        Back to the game
+      </Link>
+      </div>
     </div>
   );
 }

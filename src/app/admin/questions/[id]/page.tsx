@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { updateQuestion } from "@/lib/admin/actions";
@@ -18,15 +19,18 @@ export default async function EditQuestionPage({ params }: EditQuestionPageProps
 
   if (!question) notFound();
 
-  const updateQuestionWithId = updateQuestion.bind(null, id);
-
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold text-gray-900">Edit question</h1>
+      <div>
+        <Link href="/admin/questions" className="text-sm font-medium text-stone-500 hover:text-stone-800">
+          ← Questions
+        </Link>
+        <h1 className="mt-2 text-2xl font-bold text-stone-900">Edit question</h1>
+      </div>
       <QuestionForm
         categories={categories ?? []}
         initialValues={question}
-        action={updateQuestionWithId}
+        action={updateQuestion}
         submitLabel="Save changes"
       />
     </div>
