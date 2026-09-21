@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { LetterTiles } from "./LetterTiles";
 import { ResultsScreen } from "./ResultsScreen";
-import { calculatePoints, isAnswerCorrect } from "@/lib/game/answer";
-import type { AnsweredQuestion, Question } from "@/types/game";
+import { checkAnswer } from "@/lib/game/actions";
+import type { AnsweredQuestion, PlayQuestion } from "@/types/game";
 
 type GameScreenProps = {
   categoryId: string;
   categoryName: string;
-  questions: Question[];
+  questions: PlayQuestion[];
   nickname: string;
 };
 
@@ -19,22 +19,34 @@ export function GameScreen({ categoryId, categoryName, questions, nickname }: Ga
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("question");
   const [answers, setAnswers] = useState<AnsweredQuestion[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const question = questions[index];
 
-  function handleSubmit(submitted: string) {
-    const correct = isAnswerCorrect(
-      submitted,
-      question.accepted_answer,
-      question.alternative_answers
-    );
-    const pointsEarned = calculatePoints(correct);
-
-    setAnswers((prev) => [
-      ...prev,
-      { question, submittedAnswer: submitted, isCorrect: correct, pointsEarned },
-    ]);
-    setPhase("feedback");
+  async function handleSubmit(submitted: string) {
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await checkAnswer(question.id, submitted);
+      setAnswers((prev) => [
+        ...prev,
+        {
+          question,
+          submittedAnswer: submitted,
+          isCorrect: result.isCorrect,
+          pointsEarned: result.pointsEarned,
+          acceptedAnswer: result.acceptedAnswer,
+          explanation: result.explanation,
+          sourceName: result.sourceName,
+        },
+      ]);
+      setPhase("feedback");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not check that answer.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   function handleNext() {
@@ -78,7 +90,14 @@ export function GameScreen({ categoryId, categoryName, questions, nickname }: Ga
 
           <h1 className="text-center text-2xl font-bold text-gray-900">{question.prompt}</h1>
 
-          <LetterTiles answer={question.accepted_answer} onSubmit={handleSubmit} />
+          <LetterTiles
+            key={question.id}
+            letters={question.letter_tiles}
+            answerLength={question.answer_length}
+            disabled={busy}
+            onSubmit={handleSubmit}
+          />
+          {error && <div className="text-sm text-red-600">{error}</div>}
         </>
       )}
 
@@ -91,17 +110,13 @@ export function GameScreen({ categoryId, categoryName, questions, nickname }: Ga
           >
             {lastAnswer.isCorrect ? "Correct! 🔥" : "Not quite!"}
           </div>
-          <div className="text-lg font-semibold text-gray-800">
-            {lastAnswer.question.accepted_answer}
-          </div>
-          {lastAnswer.question.explanation && (
-            <div className="max-w-sm rounded-xl bg-amber-50 p-4 text-sm text-gray-700">
+          <div className="text-lg font-semibold text-gray-800">{lastAnswer.acceptedAnswer}</div>
+          {lastAnswer.explanation && (
+            <div className="max-w-sm rounded-xl bg-amber-50 p-4 text-sm text-amber-950">
               <span className="font-semibold">Did you know? </span>
-              {lastAnswer.question.explanation}
-              {lastAnswer.question.source_name && (
-                <div className="mt-2 text-xs text-gray-500">
-                  Source: {lastAnswer.question.source_name}
-                </div>
+              {lastAnswer.explanation}
+              {lastAnswer.sourceName && (
+                <div className="mt-2 text-xs text-amber-900">Source: {lastAnswer.sourceName}</div>
               )}
             </div>
           )}

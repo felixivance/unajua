@@ -1,26 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { buildLetterTiles, normalizeAnswer } from "@/lib/game/answer";
+import { useState } from "react";
 
 type LetterTilesProps = {
-  answer: string;
+  letters: string[];
+  answerLength: number;
   disabled?: boolean;
-  onSubmit: (value: string) => void;
+  onSubmit: (value: string) => void | Promise<void>;
 };
 
 type Tile = { id: string; letter: string; used: boolean };
 
-export function LetterTiles({ answer, disabled, onSubmit }: LetterTilesProps) {
-  const [tiles, setTiles] = useState<Tile[]>([]);
+export function LetterTiles({ letters, answerLength, disabled, onSubmit }: LetterTilesProps) {
+  const [tiles, setTiles] = useState<Tile[]>(() =>
+    letters.map((letter, i) => ({ id: `${i}-${letter}`, letter, used: false }))
+  );
   const [selected, setSelected] = useState<Tile[]>([]);
-  const answerLength = normalizeAnswer(answer).replace(/ /g, "").length;
-
-  useEffect(() => {
-    const letters = buildLetterTiles(answer);
-    setTiles(letters.map((letter, i) => ({ id: `${i}-${letter}`, letter, used: false })));
-    setSelected([]);
-  }, [answer]);
 
   function selectTile(tile: Tile) {
     if (disabled || tile.used || selected.length >= answerLength) return;
@@ -37,7 +32,7 @@ export function LetterTiles({ answer, disabled, onSubmit }: LetterTilesProps) {
 
   function submit() {
     if (disabled || selected.length !== answerLength) return;
-    onSubmit(selected.map((t) => t.letter).join(""));
+    void onSubmit(selected.map((t) => t.letter).join(""));
   }
 
   return (

@@ -1,14 +1,11 @@
-export type Question = {
+export type PlayQuestion = {
   id: string;
   category_id: string;
   prompt: string;
   image_url: string | null;
-  accepted_answer: string;
-  alternative_answers: string[];
-  explanation: string | null;
-  source_name: string | null;
-  source_url: string | null;
   difficulty: number;
+  letter_tiles: string[];
+  answer_length: number;
 };
 
 export type Category = {
@@ -19,8 +16,11 @@ export type Category = {
 };
 
 export type AnsweredQuestion = {
-  question: Question;
+  question: PlayQuestion;
   submittedAnswer: string;
   isCorrect: boolean;
   pointsEarned: number;
+  acceptedAnswer: string;
+  explanation: string | null;
+  sourceName: string | null;
 };

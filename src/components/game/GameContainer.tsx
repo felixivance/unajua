@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { GameScreen } from "./GameScreen";
 import { getStoredNickname, storeNickname } from "@/lib/game/nickname";
-import type { Question } from "@/types/game";
+import type { PlayQuestion } from "@/types/game";
 
 type GameContainerProps = {
   categoryId: string;
   categoryName: string;
-  questions: Question[];
+  questions: PlayQuestion[];
 };
 
 export function GameContainer({ categoryId, categoryName, questions }: GameContainerProps) {
