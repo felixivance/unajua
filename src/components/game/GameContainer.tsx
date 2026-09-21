@@ -2,24 +2,44 @@
 
 import { useEffect, useState } from "react";
 import { GameScreen } from "./GameScreen";
+import { startGame, type GameSession } from "@/lib/game/actions";
 import { getStoredNickname, storeNickname } from "@/lib/game/nickname";
-import type { PlayQuestion } from "@/types/game";
 
 type GameContainerProps = {
   categoryId: string;
   categoryName: string;
-  questions: PlayQuestion[];
 };
 
-export function GameContainer({ categoryId, categoryName, questions }: GameContainerProps) {
+export function GameContainer({ categoryId, categoryName }: GameContainerProps) {
   const [nickname, setNickname] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [hydrated, setHydrated] = useState(false);
+  const [session, setSession] = useState<GameSession | null>(null);
+  const [startError, setStartError] = useState<string | null>(null);
 
   useEffect(() => {
     setNickname(getStoredNickname());
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!nickname) return;
+    let cancelled = false;
+    setStartError(null);
+    // ponytail: Strict Mode can start a second unfinished game; those rows never complete.
+    startGame(categoryId, nickname)
+      .then((next) => {
+        if (!cancelled) setSession(next);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setStartError(err instanceof Error ? err.message : "Could not start the game.");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [nickname, categoryId]);
 
   function handleStart(e: React.FormEvent) {
     e.preventDefault();
@@ -59,12 +79,28 @@ export function GameContainer({ categoryId, categoryName, questions }: GameConta
     );
   }
 
+  if (startError) {
+    return (
+      <div className="mx-auto flex min-h-screen max-w-sm flex-col items-center justify-center gap-4 px-4 text-center">
+        <div className="text-lg font-semibold text-stone-900">Could not start</div>
+        <p className="text-sm text-red-600">{startError}</p>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="mx-auto flex min-h-screen max-w-sm items-center justify-center px-4 text-sm text-stone-500">
+        Starting game…
+      </div>
+    );
+  }
+
   return (
     <GameScreen
-      categoryId={categoryId}
+      gameId={session.gameId}
       categoryName={categoryName}
-      questions={questions}
-      nickname={nickname}
+      questions={session.questions}
     />
   );
 }

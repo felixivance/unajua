@@ -3,19 +3,18 @@
 import { useState } from "react";
 import { LetterTiles } from "./LetterTiles";
 import { ResultsScreen } from "./ResultsScreen";
-import { checkAnswer } from "@/lib/game/actions";
+import { submitGameAnswer } from "@/lib/game/actions";
 import type { AnsweredQuestion, PlayQuestion } from "@/types/game";
 
 type GameScreenProps = {
-  categoryId: string;
+  gameId: string;
   categoryName: string;
   questions: PlayQuestion[];
-  nickname: string;
 };
 
 type Phase = "question" | "feedback" | "results";
 
-export function GameScreen({ categoryId, categoryName, questions, nickname }: GameScreenProps) {
+export function GameScreen({ gameId, categoryName, questions }: GameScreenProps) {
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("question");
   const [answers, setAnswers] = useState<AnsweredQuestion[]>([]);
@@ -28,7 +27,7 @@ export function GameScreen({ categoryId, categoryName, questions, nickname }: Ga
     setBusy(true);
     setError(null);
     try {
-      const result = await checkAnswer(question.id, submitted);
+      const result = await submitGameAnswer(gameId, question.id, submitted);
       setAnswers((prev) => [
         ...prev,
         {
@@ -60,12 +59,7 @@ export function GameScreen({ categoryId, categoryName, questions, nickname }: Ga
 
   if (phase === "results") {
     return (
-      <ResultsScreen
-        categoryId={categoryId}
-        categoryName={categoryName}
-        answers={answers}
-        nickname={nickname}
-      />
+      <ResultsScreen gameId={gameId} categoryName={categoryName} answers={answers} />
     );
   }
 

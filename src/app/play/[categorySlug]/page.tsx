@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { GameContainer } from "@/components/game/GameContainer";
-import type { PlayQuestion } from "@/types/game";
 
 type PlayPageProps = {
   params: Promise<{ categorySlug: string }>;
@@ -20,17 +19,14 @@ export default async function PlayPage({ params }: PlayPageProps) {
 
   if (!category) notFound();
 
-  const { data: questions, error } = await supabase.rpc("get_play_questions", {
-    p_category_id: category.id,
-  });
+  const { data: sample } = await supabase
+    .from("questions")
+    .select("id")
+    .eq("category_id", category.id)
+    .eq("is_active", true)
+    .limit(1);
 
-  if (error || !questions?.length) notFound();
+  if (!sample?.length) notFound();
 
-  return (
-    <GameContainer
-      categoryId={category.id}
-      categoryName={category.name}
-      questions={questions as PlayQuestion[]}
-    />
-  );
+  return <GameContainer categoryId={category.id} categoryName={category.name} />;
 }

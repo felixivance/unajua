@@ -1,42 +1,34 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useEffect, useRef, useState } from "react";
+import { completeGame, type GameResult } from "@/lib/game/actions";
 import type { AnsweredQuestion } from "@/types/game";
 
 type ResultsScreenProps = {
-  categoryId: string;
+  gameId: string;
   categoryName: string;
   answers: AnsweredQuestion[];
-  nickname: string;
 };
 
-export function ResultsScreen({ categoryId, categoryName, answers, nickname }: ResultsScreenProps) {
-  const correctCount = answers.filter((a) => a.isCorrect).length;
-  const totalPoints = answers.reduce((sum, a) => sum + a.pointsEarned, 0);
-  const shareText = `🇰🇪 Tambua Kenya\nI scored ${correctCount}/${answers.length} on ${categoryName}!\nCan you beat me?`;
-
-  const savedRef = useRef(false);
+export function ResultsScreen({ gameId, categoryName, answers }: ResultsScreenProps) {
+  const [result, setResult] = useState<GameResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const startedRef = useRef(false);
 
   useEffect(() => {
-    if (savedRef.current) return;
-    savedRef.current = true;
-
-    const supabase = createClient();
-    supabase
-      .from("games")
-      .insert({
-        category_id: categoryId,
-        score: totalPoints,
-        total_questions: answers.length,
-        guest_nickname: nickname,
-        completed_at: new Date().toISOString(),
-      })
-      .then(({ error }) => {
-        if (error) console.error("Failed to save game", error);
+    if (startedRef.current) return;
+    startedRef.current = true;
+    completeGame(gameId)
+      .then(setResult)
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : "Could not save that game.");
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [gameId]);
+
+  const correctCount = result?.correctCount ?? answers.filter((a) => a.isCorrect).length;
+  const totalQuestions = result?.totalQuestions ?? answers.length;
+  const totalPoints = result?.score ?? answers.reduce((sum, a) => sum + a.pointsEarned, 0);
+  const shareText = `🇰🇪 Tambua Kenya\nI scored ${correctCount}/${totalQuestions} on ${categoryName}!\nCan you beat me?`;
 
   async function handleShare() {
     const shareUrl = typeof window !== "undefined" ? window.location.href : "";
@@ -60,9 +52,10 @@ export function ResultsScreen({ categoryId, categoryName, answers, nickname }: R
         {categoryName}
       </div>
       <div className="text-6xl font-extrabold text-gray-900">
-        {correctCount}/{answers.length}
+        {correctCount}/{totalQuestions}
       </div>
       <div className="text-lg font-medium text-gray-600">{totalPoints} points earned</div>
+      {error && <div className="text-sm text-red-600">{error}</div>}
 
       <div className="flex w-full flex-col gap-3">
         <button
