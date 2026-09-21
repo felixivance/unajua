@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { GameShell } from "./GameShell";
 import { completeGame, type GameResult } from "@/lib/game/actions";
 import type { AnsweredQuestion } from "@/types/game";
 
@@ -8,9 +10,10 @@ type ResultsScreenProps = {
   gameId: string;
   categoryName: string;
   answers: AnsweredQuestion[];
+  handle: string;
 };
 
-export function ResultsScreen({ gameId, categoryName, answers }: ResultsScreenProps) {
+export function ResultsScreen({ gameId, categoryName, answers, handle }: ResultsScreenProps) {
   const [result, setResult] = useState<GameResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const startedRef = useRef(false);
@@ -47,33 +50,40 @@ export function ResultsScreen({ gameId, categoryName, answers }: ResultsScreenPr
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-6 px-4 py-10 text-center">
-      <div className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
-        {categoryName}
-      </div>
-      <div className="text-6xl font-extrabold text-gray-900">
-        {correctCount}/{totalQuestions}
-      </div>
-      <div className="text-lg font-medium text-gray-600">{totalPoints} points earned</div>
-      {error && <div className="text-sm text-red-600">{error}</div>}
+    <GameShell>
+      <div className="game-pop flex flex-1 flex-col items-center justify-center gap-6 text-center">
+        <h1 className="text-6xl font-extrabold tracking-tight text-stone-900">
+          {correctCount}/{totalQuestions}
+        </h1>
+        <p className="text-lg font-semibold text-stone-600">{totalPoints} points on {categoryName}</p>
+        <p className="text-sm text-stone-500">
+          On the board as <span className="font-semibold text-stone-800">{handle}</span>
+        </p>
+        {error && (
+          <p role="alert" className="text-sm text-red-700">
+            {error}
+          </p>
+        )}
 
-      <div className="flex w-full flex-col gap-3">
-        <button
-          onClick={handleShare}
-          className="rounded-full bg-red-600 px-10 py-3 text-lg font-bold text-white"
-        >
-          Challenge a friend
-        </button>
-        <a
-          href="/play"
-          className="rounded-full border-2 border-emerald-600 px-10 py-3 text-lg font-bold text-emerald-700"
-        >
-          Play again
-        </a>
-        <a href="/" className="text-sm text-gray-500 underline">
-          Back to home
-        </a>
+        <div className="flex w-full max-w-sm flex-col gap-3">
+          <button
+            type="button"
+            onClick={() => void handleShare()}
+            className="min-h-14 rounded-full bg-red-600 text-lg font-bold text-white shadow-[0_10px_24px_rgba(220,38,38,0.28)] hover:bg-red-500 active:scale-[0.98]"
+          >
+            Challenge a friend
+          </button>
+          <Link
+            href="/play"
+            className="grid min-h-14 place-items-center rounded-full border-2 border-emerald-700 text-lg font-bold text-emerald-800 hover:bg-emerald-50"
+          >
+            Play again
+          </Link>
+          <Link href="/" className="min-h-11 text-sm font-semibold text-stone-500 underline">
+            Back to home
+          </Link>
+        </div>
       </div>
-    </div>
+    </GameShell>
   );
 }

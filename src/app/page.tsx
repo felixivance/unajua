@@ -35,13 +35,14 @@ export default async function Home() {
     { data: categories },
     { data: activeQuestions },
     { count: gamesPlayed },
+    { data: completedNicknames },
   ] = await Promise.all([
     supabase
       .from('games')
       .select('id, score, total_questions, guest_nickname, categories(name)')
       .not('completed_at', 'is', null)
       .order('score', { ascending: false })
-      .limit(8),
+      .limit(10),
     supabase
       .from('categories')
       .select('id, slug, name')
@@ -51,6 +52,10 @@ export default async function Home() {
     supabase
       .from('games')
       .select('id', { count: 'exact', head: true })
+      .not('completed_at', 'is', null),
+    supabase
+      .from('games')
+      .select('guest_nickname')
       .not('completed_at', 'is', null),
   ]);
 
@@ -65,6 +70,12 @@ export default async function Home() {
     (category) => (questionCounts.get(category.id) ?? 0) > 0,
   );
   const totalQuestions = activeQuestions?.length ?? 0;
+  // ponytail: distinct on first 1000 completed rows; SQL count(distinct) if this grows
+  const playerCount = new Set(
+    (completedNicknames ?? [])
+      .map((row) => row.guest_nickname?.trim().toLowerCase())
+      .filter(Boolean),
+  ).size;
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
@@ -204,14 +215,11 @@ export default async function Home() {
           <div className="mx-auto max-w-5xl px-4 sm:px-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-2xl font-extrabold text-stone-900">
-                Leaderboard
+                Top 10
               </h2>
-              {!!topGames?.length && (
-                <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500 motion-reduce:animate-none" />
-                  Updated live
-                </span>
-              )}
+              <span className="text-sm font-semibold text-stone-500">
+                {gamesPlayed ?? 0} games · {playerCount} players
+              </span>
             </div>
 
             <div className="flex flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
@@ -271,13 +279,21 @@ export default async function Home() {
       {/* Stats strip: warm tinted band, real numbers */}
       <Reveal>
         <section className="bg-amber-50 py-16 sm:py-20">
-          <div className="mx-auto grid max-w-5xl grid-cols-3 gap-4 px-4 text-center sm:px-6">
+          <div className="mx-auto grid max-w-5xl grid-cols-2 gap-4 px-4 text-center sm:grid-cols-4 sm:px-6">
             <div className="flex flex-col gap-1 rounded-2xl border border-amber-100 bg-white py-6 shadow-sm">
               <span className="text-3xl font-extrabold text-stone-900">
                 {gamesPlayed ?? 0}
               </span>
               <span className="text-xs font-semibold text-stone-500">
                 games played
+              </span>
+            </div>
+            <div className="flex flex-col gap-1 rounded-2xl border border-amber-100 bg-white py-6 shadow-sm">
+              <span className="text-3xl font-extrabold text-stone-900">
+                {playerCount}
+              </span>
+              <span className="text-xs font-semibold text-stone-500">
+                players
               </span>
             </div>
             <div className="flex flex-col gap-1 rounded-2xl border border-amber-100 bg-white py-6 shadow-sm">

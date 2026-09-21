@@ -36,16 +36,21 @@ export function LetterTiles({ letters, answerLength, disabled, onSubmit }: Lette
   }
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex w-full flex-col items-center gap-7">
       <div className="flex flex-wrap justify-center gap-2">
         {Array.from({ length: answerLength }).map((_, i) => {
           const tile = selected[i];
           return (
             <button
               key={i}
+              type="button"
               onClick={removeLast}
               disabled={!tile || disabled}
-              className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-emerald-600 bg-white text-xl font-bold text-emerald-900 disabled:opacity-100"
+              className={`grid h-12 w-12 place-items-center rounded-lg border-2 text-xl font-extrabold transition-[transform,background-color,border-color] duration-150 [touch-action:manipulation] ${
+                tile
+                  ? "game-tile-in border-emerald-700 bg-white text-emerald-900"
+                  : "border-stone-300 bg-stone-100 text-stone-400"
+              }`}
             >
               {tile?.letter ?? ""}
             </button>
@@ -54,12 +59,14 @@ export function LetterTiles({ letters, answerLength, disabled, onSubmit }: Lette
       </div>
 
       <div className="flex flex-wrap justify-center gap-2">
-        {tiles.map((tile) => (
+        {tiles.map((tile, i) => (
           <button
             key={tile.id}
+            type="button"
             onClick={() => selectTile(tile)}
             disabled={tile.used || disabled}
-            className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-600 text-xl font-bold text-white transition disabled:bg-emerald-200 disabled:text-emerald-400"
+            style={{ animationDelay: `${Math.min(i, 8) * 30}ms` }}
+            className="game-tile-in grid h-12 w-12 place-items-center rounded-lg bg-emerald-700 text-xl font-extrabold text-white shadow-[0_4px_0_#065f46] [touch-action:manipulation] transition-transform duration-150 active:translate-y-0.5 active:shadow-none disabled:translate-y-0 disabled:bg-emerald-100 disabled:text-emerald-800 disabled:shadow-none"
           >
             {tile.letter}
           </button>
@@ -67,11 +74,12 @@ export function LetterTiles({ letters, answerLength, disabled, onSubmit }: Lette
       </div>
 
       <button
+        type="button"
         onClick={submit}
         disabled={disabled || selected.length !== answerLength}
-        className="rounded-full bg-red-600 px-10 py-3 text-lg font-bold text-white transition disabled:bg-gray-300"
+        className="min-h-14 rounded-full bg-red-600 px-12 text-lg font-bold text-white shadow-[0_8px_20px_rgba(220,38,38,0.25)] hover:bg-red-500 active:scale-[0.98] disabled:bg-red-50 disabled:text-red-900 disabled:shadow-none"
       >
-        Submit
+        {disabled ? "Checking…" : "Submit"}
       </button>
     </div>
   );

@@ -204,7 +204,8 @@ type PlayQuestion = {
 - Correct: **100 points**
 - Incorrect: **0**
 - `difficulty` is stored but **does not change points yet**
-- No timer, no speed bonus, no hints, no skip
+- No timer, no speed bonus, no hints
+- Skip is allowed: client submits `SKIP` through `submit_game_answer` (incorrect, 0 points) and advances immediately. Do not show the accepted answer or explanation on skip.
 
 A client-supplied score is rejected. Direct `INSERT`/`UPDATE` on `games` / `game_answers` as anon is denied.
 
@@ -273,7 +274,6 @@ These exist in code today. Close them as part of “working web game,” not as 
 
 | Gap | Why it matters |
 |---|---|
-| `get_play_questions` takes the first 10 rows, not a random deal | Repeat play feels identical |
 | React Strict Mode can call `start_game` twice | Orphan in-progress game rows |
 | Leaderboard badge says “Updated live” but the page is server-rendered | Misleading |
 | `source_url` is stored and returned, never shown | Attribution incomplete |
@@ -283,9 +283,7 @@ These exist in code today. Close them as part of “working web game,” not as 
 
 Optional polish that is still web-complete-adjacent:
 
-- Shuffle / randomize dealt questions each round
 - Show source as a link when `source_url` exists
-- Hide or reword “Updated live”
 - One `start_game` per mount (ignore the second Strict Mode call, or reuse the session)
 
 ---
@@ -296,7 +294,7 @@ The PRD describes a much larger product. **Do not build these on the way to a wo
 
 - Player accounts, profiles, streaks, badges
 - Timers and speed scoring
-- Hints, skip, “almost there”
+- Hints, “almost there”
 - Daily challenge, friend vs friend, party mode
 - Audio / video questions
 - Per-category leaderboard pages, global seasons
@@ -305,6 +303,20 @@ The PRD describes a much larger product. **Do not build these on the way to a wo
 - App Store / Play Store / Expo project
 
 If a feature is not in **Player features**, **Admin features**, or **Web-complete gate**, it is not required to recreate the current game.
+
+---
+
+## Later: per-question share cards (do not build yet)
+
+Share-a-score already exists on the results screen. A later pass should let a player share **one question** as a card to WhatsApp / Instagram / X, with a link back to the app.
+
+Intended shape (when we pick this up):
+
+- A “Share this puzzle” action on the **feedback** screen only (after submit or skip). Never before the answer is revealed — that would leak the puzzle without the pay-in.
+- A generated image card (same 16:9 rebus style): question image or prompt, the accepted answer, a one-line explanation, Tambua Kenya wordmark, and `tambua` play URL (category deep link if we have one).
+- Native `navigator.share` with the image file + text fallback (`Guessed NAROK on Tambua Kenya — your turn: {url}`). WhatsApp and Instagram pick up the image; clipboard fallback is text + URL.
+- Do not require an account. Do not put the next unanswered question on the card.
+- Track later, not now: share tap count is a vanity metric, not a launch blocker.
 
 ---
 
@@ -338,7 +350,7 @@ Use this when recreating or reviewing:
 | Types | `src/types/game.ts` |
 | Admin | `src/app/admin/**`, `src/lib/admin/**`, `src/components/admin/QuestionForm.tsx` |
 | Auth refresh | `src/middleware.ts` |
-| Schema | `supabase/migrations/0001_init.sql` … `0008_fix_start_game.sql` |
+| Schema | `supabase/migrations/0001_init.sql` … `0009_shuffle_play_questions.sql` |
 
 Integrity migrations to preserve:
 

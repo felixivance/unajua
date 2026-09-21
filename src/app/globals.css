@@ -29,3 +29,76 @@ body {
   background-image: radial-gradient(circle, rgb(0 0 0 / 0.08) 1.5px, transparent 1.5px);
   background-size: 22px 22px;
 }
+
+.game-root {
+  caret-color: #047857;
+}
+
+.game-root ::selection {
+  background: #047857;
+  color: #fff;
+}
+
+@keyframes game-pop {
+  from {
+    transform: scale(0.94);
+    filter: blur(6px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+@keyframes game-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-7px);
+  }
+  40% {
+    transform: translateX(7px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes game-tile-in {
+  from {
+    transform: scale(0.82);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.game-pop {
+  animation: game-pop 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.game-shake {
+  animation: game-shake 380ms ease-out;
+}
+
+.game-tile-in {
+  animation: game-tile-in 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-pop,
+  .game-shake,
+  .game-tile-in {
+    animation: none;
+    filter: none;
+  }
+}

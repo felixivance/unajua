@@ -14,6 +14,18 @@
         "value": "arial",
         "createdAt": "2026-09-17T08:21:01.562Z",
         "reason": "pre-existing globals.css fallback, unrelated to this session's homepage work; Arial isn't the AI-slop-font pattern this rule targets"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#047857",
+        "createdAt": "2026-09-21T20:47:02.263Z",
+        "reason": "Incumbent Tambua emerald (home/play flag palette), not Claude DESIGN.md"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgb(0 0 0 / 0.08)",
+        "createdAt": "2026-09-21T20:47:02.315Z",
+        "reason": "Existing dot-grid token already used on play hub"
       }
     ]
   }

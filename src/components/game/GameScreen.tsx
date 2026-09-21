@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { LetterTiles } from "./LetterTiles";
 import { ResultsScreen } from "./ResultsScreen";
+import { GameShell } from "./GameShell";
 import { submitGameAnswer } from "@/lib/game/actions";
 import type { AnsweredQuestion, PlayQuestion } from "@/types/game";
 
@@ -10,11 +11,12 @@ type GameScreenProps = {
   gameId: string;
   categoryName: string;
   questions: PlayQuestion[];
+  handle: string;
 };
 
 type Phase = "question" | "feedback" | "results";
 
-export function GameScreen({ gameId, categoryName, questions }: GameScreenProps) {
+export function GameScreen({ gameId, categoryName, questions, handle }: GameScreenProps) {
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("question");
   const [answers, setAnswers] = useState<AnsweredQuestion[]>([]);
@@ -22,6 +24,10 @@ export function GameScreen({ gameId, categoryName, questions }: GameScreenProps)
   const [error, setError] = useState<string | null>(null);
 
   const question = questions[index];
+  const answered = answers.length;
+  const right = answers.filter((a) => a.isCorrect).length;
+  const wrong = answered - right;
+  const progress = questions.length ? (answered / questions.length) * 100 : 0;
 
   async function handleSubmit(submitted: string) {
     setBusy(true);
@@ -35,12 +41,20 @@ export function GameScreen({ gameId, categoryName, questions }: GameScreenProps)
           submittedAnswer: submitted,
           isCorrect: result.isCorrect,
           pointsEarned: result.pointsEarned,
-          acceptedAnswer: result.acceptedAnswer,
-          explanation: result.explanation,
-          sourceName: result.sourceName,
+          acceptedAnswer: submitted === "SKIP" ? "" : result.acceptedAnswer,
+          explanation: submitted === "SKIP" ? null : result.explanation,
+          sourceName: submitted === "SKIP" ? null : result.sourceName,
         },
       ]);
-      setPhase("feedback");
+      if (submitted === "SKIP") {
+        if (index + 1 >= questions.length) setPhase("results");
+        else {
+          setIndex((prev) => prev + 1);
+          setPhase("question");
+        }
+      } else {
+        setPhase("feedback");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not check that answer.");
     } finally {
@@ -59,30 +73,58 @@ export function GameScreen({ gameId, categoryName, questions }: GameScreenProps)
 
   if (phase === "results") {
     return (
-      <ResultsScreen gameId={gameId} categoryName={categoryName} answers={answers} />
+      <ResultsScreen
+        gameId={gameId}
+        categoryName={categoryName}
+        answers={answers}
+        handle={handle}
+      />
     );
   }
 
   const lastAnswer = answers[answers.length - 1];
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-lg flex-col items-center gap-8 px-4 py-10">
-      <div className="w-full text-center text-sm font-semibold text-emerald-700">
-        {categoryName} · Question {index + 1} of {questions.length}
+    <GameShell
+      trailing={
+        <span className="text-sm font-bold tabular-nums text-stone-700">
+          {Math.min(index + 1, questions.length)}/{questions.length}
+        </span>
+      }
+    >
+      <div className="mb-6">
+        <div className="mb-2 flex items-center justify-between gap-3 text-sm font-semibold">
+          <span className="text-stone-600">{categoryName}</span>
+          <span className="tabular-nums text-stone-500">
+            <span className="text-emerald-700">{right} right</span>
+            <span className="mx-1.5 text-stone-300">·</span>
+            <span className="text-red-600">{wrong} wrong</span>
+          </span>
+        </div>
+        <div className="h-1.5 overflow-hidden rounded-full bg-stone-200">
+          <div
+            className="h-full bg-emerald-700 transition-[width] duration-300 ease-out motion-reduce:transition-none"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       </div>
 
       {phase === "question" && (
-        <>
+        <div key={question.id} className="game-pop flex flex-col items-center gap-7">
           {question.image_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={question.image_url}
-              alt="Guess this"
-              className="max-h-60 w-full rounded-xl object-contain"
-            />
+            <div className="w-full overflow-hidden rounded-2xl border border-stone-200 bg-white p-4 shadow-[0_8px_24px_rgba(28,25,23,0.08)]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={question.image_url}
+                alt="Guess this"
+                className="mx-auto max-h-56 object-contain"
+              />
+            </div>
           )}
 
-          <h1 className="text-center text-2xl font-bold text-gray-900">{question.prompt}</h1>
+          <h1 className="text-center text-2xl font-extrabold tracking-tight text-stone-900 text-balance">
+            {question.prompt}
+          </h1>
 
           <LetterTiles
             key={question.id}
@@ -91,22 +133,40 @@ export function GameScreen({ gameId, categoryName, questions }: GameScreenProps)
             disabled={busy}
             onSubmit={handleSubmit}
           />
-          {error && <div className="text-sm text-red-600">{error}</div>}
-        </>
+          {error && (
+            <p role="alert" className="text-sm text-red-700">
+              {error}
+            </p>
+          )}
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void handleSubmit("SKIP")}
+            className="min-h-11 text-sm font-semibold text-stone-500 underline disabled:opacity-50"
+          >
+            Skip
+          </button>
+        </div>
       )}
 
       {phase === "feedback" && lastAnswer && (
-        <div className="flex flex-col items-center gap-4 text-center">
+        <div className="flex flex-col items-center gap-5 text-center">
           <div
-            className={`text-3xl font-extrabold ${
-              lastAnswer.isCorrect ? "text-emerald-600" : "text-red-600"
+            className={`text-4xl font-extrabold tracking-tight ${
+              lastAnswer.isCorrect ? "game-pop text-emerald-700" : "game-shake text-red-600"
             }`}
           >
-            {lastAnswer.isCorrect ? "Correct! 🔥" : "Not quite!"}
+            {lastAnswer.isCorrect ? "Correct!" : "Not quite"}
           </div>
-          <div className="text-lg font-semibold text-gray-800">{lastAnswer.acceptedAnswer}</div>
+          <div
+            className={`text-2xl font-extrabold tracking-tight text-stone-900 ${
+              lastAnswer.isCorrect ? "" : "game-shake"
+            }`}
+          >
+            {lastAnswer.acceptedAnswer}
+          </div>
           {lastAnswer.explanation && (
-            <div className="max-w-sm rounded-xl bg-amber-50 p-4 text-sm text-amber-950">
+            <div className="w-full max-w-sm rounded-2xl bg-amber-50 px-5 py-4 text-left text-sm text-amber-950">
               <span className="font-semibold">Did you know? </span>
               {lastAnswer.explanation}
               {lastAnswer.sourceName && (
@@ -115,18 +175,16 @@ export function GameScreen({ gameId, categoryName, questions }: GameScreenProps)
             </div>
           )}
           {lastAnswer.isCorrect && (
-            <div className="text-sm font-medium text-emerald-700">
-              +{lastAnswer.pointsEarned} points
-            </div>
+            <div className="text-sm font-bold text-emerald-700">+{lastAnswer.pointsEarned} points</div>
           )}
           <button
             onClick={handleNext}
-            className="rounded-full bg-emerald-600 px-10 py-3 text-lg font-bold text-white"
+            className="min-h-14 rounded-full bg-emerald-700 px-10 text-lg font-bold text-white hover:bg-emerald-800 active:scale-[0.98]"
           >
             {index + 1 >= questions.length ? "See results" : "Next question"}
           </button>
         </div>
       )}
-    </div>
+    </GameShell>
   );
 }
