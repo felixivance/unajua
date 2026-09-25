@@ -1,6 +1,6 @@
-# Tambua — The Kenyan Knowledge Game
+# Unajua — The Kenyan Knowledge Game
 
-**Product:** Tambua  
+**Product:** Unajua  
 **Working tagline:** *How well do you know Kenya?*  
 **Initial market:** Kenya  
 **Future markets:** Tanzania → East Africa → other localized markets  
@@ -13,15 +13,15 @@
 
 # 1. Product Vision
 
-Tambua is a gamified knowledge and discovery application built around **Kenyan culture, places, people, brands, history, trends and everyday experiences**.
+Unajua is a gamified knowledge and discovery application built around **Kenyan culture, places, people, brands, history, trends and everyday experiences**.
 
 The core idea is simple:
 
-> **Show me something. Can you Tambua it?**
+> **Show me something. Unajua?**
 
 A player may see a photograph of a building, hear a short audio clip, see a Kenyan brand logo, identify a town from a landmark, recognize a famous personality, complete a slogan, or answer an interesting fact about Kenya.
 
-Tambua turns this knowledge into a game.
+Unajua turns this knowledge into a game.
 
 The product should sit somewhere between:
 
@@ -34,7 +34,7 @@ The product should sit somewhere between:
 
 But its differentiator is **deep local relevance**.
 
-Instead of asking generic questions that could belong to any country, Tambua asks questions that make a Kenyan say:
+Instead of asking generic questions that could belong to any country, Unajua asks questions that make a Kenyan say:
 
 > "I should know this!"
 
@@ -46,7 +46,7 @@ or:
 
 # 2. The Core Product Philosophy
 
-Tambua should not initially try to become a massive social network or complicated multiplayer platform.
+Unajua should not initially try to become a massive social network or complicated multiplayer platform.
 
 The first objective is:
 
@@ -135,19 +135,19 @@ Potential categories include:
 
 ### 4. Families
 
-Tambua should eventually support a family-friendly experience where parents and children can play together.
+Unajua should eventually support a family-friendly experience where parents and children can play together.
 
 ### 5. House parties and social groups
 
 This is an important future use case.
 
-A group could put Tambua on a TV or screen and compete together.
+A group could put Unajua on a TV or screen and compete together.
 
 ---
 
 # 5. Core Value Proposition
 
-Tambua should communicate three things:
+Unajua should communicate three things:
 
 ### Learn
 
@@ -175,7 +175,7 @@ The MVP is **not** intended to prove the entire business.
 
 It is intended to answer one question:
 
-> **Do people find Tambua fun enough to play repeatedly?**
+> **Do people find Unajua fun enough to play repeatedly?**
 
 The MVP should therefore contain only the functionality required to create the core game loop.
 
@@ -276,7 +276,7 @@ If correct:
 
 # 9. Answer Mechanism
 
-Rather than allowing unrestricted text input, Tambua should use **letter tiles**.
+Rather than allowing unrestricted text input, Unajua should use **letter tiles**.
 
 This is inspired by the Logo Quiz experience but can be improved significantly.
 
@@ -306,7 +306,7 @@ Benefits:
 
 This is an important part of the game experience.
 
-If the player enters an answer that is close to the correct answer, Tambua can respond:
+If the player enters an answer that is close to the correct answer, Unajua can respond:
 
 > **Almost there! 🔥**
 
@@ -416,7 +416,7 @@ Ask:
 
 ## 5. Nostalgia
 
-This can become one of Tambua's strongest categories.
+This can become one of Unajua's strongest categories.
 
 Examples:
 
@@ -467,7 +467,7 @@ After validating the MVP:
 
 # 13. Generational Modes
 
-Tambua can eventually create separate experiences for different generations.
+Unajua can eventually create separate experiences for different generations.
 
 ### Gen Z
 
@@ -511,7 +511,7 @@ Tambua can eventually create separate experiences for different generations.
 
 # 14. Daily Challenge
 
-A daily challenge should eventually become one of Tambua's strongest retention mechanisms.
+A daily challenge should eventually become one of Unajua's strongest retention mechanisms.
 
 Every day:
 
@@ -521,7 +521,7 @@ Everyone receives the same challenge.
 
 Example:
 
-> 🇰🇪 **Today's Tambua Challenge**
+> 🇰🇪 **Today's Unajua Challenge**
 
 > Can you score 10/10?
 
@@ -537,7 +537,7 @@ This creates a reason to return every day.
 
 # 15. Weekly Content Contest
 
-Tambua should eventually introduce:
+Unajua should eventually introduce:
 
 > **This Week in Kenya**
 
@@ -648,13 +648,13 @@ Example:
 
 or:
 
-> **Kiambu players are dominating this week's Tambua Challenge.**
+> **Kiambu players are dominating this week's Unajua Challenge.**
 
 ---
 
 # 19. Gamification
 
-Tambua should use several lightweight gamification mechanics.
+Unajua should use several lightweight gamification mechanics.
 
 ### Points
 
@@ -704,7 +704,7 @@ This should be an MVP feature because it supports organic growth.
 
 After a game:
 
-> 🇰🇪 TAMBua
+> 🇰🇪 Unajua
 
 > I scored **8/10**
 
@@ -714,7 +714,7 @@ After a game:
 
 [Challenge Me]
 
-The share card should contain a deep link to Tambua.
+The share card should contain a deep link to Unajua.
 
 Potential channels:
 
@@ -774,7 +774,7 @@ This is more valuable than spending heavily on advertising during the early stag
 
 # 22. Content Philosophy
 
-Tambua's biggest long-term asset will not be the code.
+Unajua's biggest long-term asset will not be the code.
 
 It will be:
 
@@ -869,7 +869,7 @@ For changing facts, store:
 - Last verified date
 - Review date
 
-This prevents Tambua from becoming outdated.
+This prevents Unajua from becoming outdated.
 
 ---
 
@@ -996,7 +996,7 @@ Editor receives notification.
 
 ↓
 
-Editor opens Tambua Admin.
+Editor opens Unajua Admin.
 
 ↓
 
@@ -1101,7 +1101,7 @@ The safest strategy is to make the default experience broadly family friendly an
 
 Do **not** put the core game behind a paywall during MVP.
 
-Tambua should primarily be:
+Unajua should primarily be:
 
 > **Free to play.**
 
@@ -1132,7 +1132,7 @@ Potential future premium benefits:
 
 A Kenyan brand could sponsor:
 
-> "This week's Tambua Challenge"
+> "This week's Unajua Challenge"
 
 Clearly labelled as sponsored content.
 
@@ -1256,7 +1256,7 @@ Use Next.js primarily for:
 ### Public website
 
 - Landing page
-- How Tambua works
+- How Unajua works
 - Download links
 - Challenge links
 - SEO pages
@@ -1272,7 +1272,7 @@ Use Next.js primarily for:
 - Reports
 - Analytics
 
-The admin dashboard will eventually become extremely important because **content operations are the heart of Tambua**.
+The admin dashboard will eventually become extremely important because **content operations are the heart of Unajua**.
 
 ---
 
@@ -1378,7 +1378,7 @@ How many new players does each existing player generate?
 
 User sees:
 
-> "How Kenyan are you? Try the Tambua Challenge."
+> "How Kenyan are you? Try the Unajua Challenge."
 
 on TikTok, WhatsApp, Instagram or another channel.
 
@@ -1386,7 +1386,7 @@ on TikTok, WhatsApp, Instagram or another channel.
 
 ## Step 2 — Install
 
-User downloads Tambua.
+User downloads Unajua.
 
 ↓
 
@@ -1588,7 +1588,7 @@ As a player, I want to share my score so that I can challenge my friends.
 
 - Shareable card is generated.
 - Card contains score.
-- Card contains Tambua branding.
+- Card contains Unajua branding.
 - Card contains a deep link.
 - User can share through the mobile sharing system.
 
@@ -1628,7 +1628,7 @@ As a player, I want to see leaderboards so that I can compare my performance wit
 
 **US-010**
 
-As an administrator, I want to create questions so that I can continuously expand Tambua's content.
+As an administrator, I want to create questions so that I can continuously expand Unajua's content.
 
 **Acceptance criteria:**
 
@@ -1862,7 +1862,7 @@ Begin measuring retention and sharing.
 
 # 45. Content Marketing
 
-Tambua has an advantage because the product itself creates content.
+Unajua has an advantage because the product itself creates content.
 
 Examples:
 
@@ -1955,13 +1955,13 @@ Then expand into additional markets.
 
 # 48. The Bigger Vision
 
-Tambua should eventually become more than a quiz app.
+Unajua should eventually become more than a quiz app.
 
 The bigger idea is:
 
 > **A gamified cultural knowledge platform.**
 
-People come to Tambua to discover:
+People come to Unajua to discover:
 
 - What they know
 - What they don't know
@@ -2065,7 +2065,7 @@ The most important metric is:
 
 If the entire MVP had to be described in one sentence:
 
-> **Tambua lets you identify Kenyan places, people, brands and facts through fast, fun 10-question games, then compare and share your score with friends.**
+> **Unajua lets you identify Kenyan places, people, brands and facts through fast, fun 10-question games, then compare and share your score with friends.**
 
 ---
 
@@ -2119,7 +2119,7 @@ If the entire MVP had to be described in one sentence:
 
 # 54. The Immediate Next Step
 
-Do not start by building the entire Tambua platform.
+Do not start by building the entire Unajua platform.
 
 Start with:
 

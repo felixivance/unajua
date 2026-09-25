@@ -47,7 +47,7 @@ export default function AdminLoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
       <div className="flex w-full max-w-sm flex-col gap-6">
-      <h1 className="text-center text-2xl font-bold text-stone-900">Tambua Admin</h1>
+      <h1 className="text-center text-2xl font-bold text-stone-900">Unajua Admin</h1>
 
       {notAdminError && (
         <div className="rounded-lg bg-red-50 p-3 text-sm text-red-800">

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tambua Kenya",
+  title: "Unajua",
   description: "How well do you know Kenya?",
 };
 

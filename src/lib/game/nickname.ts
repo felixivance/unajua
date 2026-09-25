@@ -1,4 +1,4 @@
-const STORAGE_KEY = "tambua_nickname";
+const STORAGE_KEY = "unajua_nickname";
 
 const PLACES = [
   "Nairobi",

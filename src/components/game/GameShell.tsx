@@ -22,7 +22,7 @@ export function GameShell({
           ← {backLabel}
         </Link>
         <Link href="/" className="text-sm font-extrabold tracking-tight text-stone-900">
-          Tambua<span className="text-emerald-700"> Kenya</span>
+          Unajua
         </Link>
         {trailing ?? <span className="w-[4.5rem]" aria-hidden />}
       </header>

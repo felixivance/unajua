@@ -32,7 +32,7 @@ export default async function PlayHubPage() {
 
       <header className="mx-auto flex w-full max-w-4xl items-center justify-between px-4 py-6 sm:px-6">
         <Link href="/" className="text-lg font-extrabold tracking-tight text-stone-900">
-          Tambua<span className="text-emerald-700"> Kenya</span>
+          Unajua
         </Link>
         <Link
           href="/"

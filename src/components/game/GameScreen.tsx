@@ -26,7 +26,7 @@ export function GameScreen({ gameId, categoryName, questions, handle }: GameScre
   const question = questions[index];
   const answered = answers.length;
   const right = answers.filter((a) => a.isCorrect).length;
-  const wrong = answered - right;
+  const wrong = answers.filter((a) => !a.isCorrect && a.submittedAnswer !== "SKIP").length;
   const progress = questions.length ? (answered / questions.length) * 100 : 0;
 
   async function handleSubmit(submitted: string) {

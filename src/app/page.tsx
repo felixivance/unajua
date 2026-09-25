@@ -95,7 +95,7 @@ export default async function Home() {
 
         <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-6 sm:px-6">
           <span className="text-lg font-extrabold tracking-tight text-white">
-            Tambua<span className="text-emerald-400"> Kenya</span>
+            Unajua
           </span>
           <Link
             href="/play"
@@ -334,7 +334,7 @@ export default async function Home() {
       </Reveal>
 
       <footer className="border-t border-stone-200 bg-white py-6 text-center text-xs text-stone-400">
-        Tambua Kenya, made in Kenya 🇰🇪
+        Unajua, made in Kenya 🇰🇪
       </footer>
     </div>
   );

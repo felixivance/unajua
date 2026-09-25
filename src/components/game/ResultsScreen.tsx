@@ -31,7 +31,7 @@ export function ResultsScreen({ gameId, categoryName, answers, handle }: Results
   const correctCount = result?.correctCount ?? answers.filter((a) => a.isCorrect).length;
   const totalQuestions = result?.totalQuestions ?? answers.length;
   const totalPoints = result?.score ?? answers.reduce((sum, a) => sum + a.pointsEarned, 0);
-  const shareText = `🇰🇪 Tambua Kenya\nI scored ${correctCount}/${totalQuestions} on ${categoryName}!\nCan you beat me?`;
+  const shareText = `🇰🇪 Unajua\nI scored ${correctCount}/${totalQuestions} on ${categoryName}!\nCan you beat me?`;
 
   async function handleShare() {
     const shareUrl = typeof window !== "undefined" ? window.location.href : "";

@@ -9,7 +9,7 @@ family, regardless of who creates it or which tool generates the artwork.
 
 ## Composition
 
-- **Canvas:** 1280×720 (16:9), matches question card image aspect ratio used across Tambua.
+- **Canvas:** 1280×720 (16:9), matches question card image aspect ratio used across Unajua.
 - **Background:** flat white (`#FFFFFF`). No gradients, no scenery, no shadows on the canvas itself.
 - **Layout:** clues arranged left-to-right in reading order, vertically centered.
 - **Connector:** a bold black `+` between clue elements. Use `=` only if the final answer is

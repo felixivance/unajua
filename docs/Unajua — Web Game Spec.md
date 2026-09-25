@@ -1,10 +1,10 @@
-# Tambua Kenya — Web Game Spec
+# Unajua — Web Game Spec
 
-**Product:** Tambua Kenya  
+**Product:** Unajua  
 **Tagline:** How well do you know Kenya?  
 **Status:** Source of truth for the **web game**. Recreate and finish this first.  
 **Then:** Port the same gameplay to React Native against the same backend.  
-**Not this document:** The long-range vision. That lives in [Tambua — Product Requirements Document (PRD)](./Tambua%20—%20Product%20Requirements%20Document%20(PRD).md).
+**Not this document:** The long-range vision. That lives in [Unajua — Product Requirements Document (PRD)](./Unajua%20—%20Product%20Requirements%20Document%20(PRD).md).
 
 ---
 
@@ -37,9 +37,9 @@ Players do not need an account. Admins do.
 | UI | Tailwind CSS 4 |
 | Data | Supabase (Postgres, Auth, Storage, RLS, RPCs) |
 | Play writes | Next.js server actions calling Postgres functions |
-| Guest identity | `localStorage` key `tambua_nickname` (max 24 chars) |
+| Guest identity | `localStorage` key `unajua_nickname` (max 24 chars) |
 
-Repo name on disk is `Unajua`; the shipped product name is **Tambua Kenya**. Package name: `tambua-app`.
+Product name is **Unajua**. Package name: `unajua-app`.
 
 ---
 
@@ -74,7 +74,7 @@ These are live today. A recreated web game is incomplete until all of them work.
 
 ### Home
 
-- Brand: **Tambua Kenya**
+- Brand: **Unajua**
 - Primary CTA to `/play`
 - Three-step how-to: pick a category → solve ten rounds with letter tiles, no clock → climb the board
 - Horizontal list of playable categories with icon, name, question count
@@ -118,7 +118,7 @@ These are live today. A recreated web game is incomplete until all of them work.
 Share text:
 
 ```text
-🇰🇪 Tambua Kenya
+🇰🇪 Unajua
 I scored {correct}/{total} on {category}!
 Can you beat me?
 ```
@@ -205,7 +205,7 @@ type PlayQuestion = {
 - Incorrect: **0**
 - `difficulty` is stored but **does not change points yet**
 - No timer, no speed bonus, no hints
-- Skip is allowed: client submits `SKIP` through `submit_game_answer` (incorrect, 0 points) and advances immediately. Do not show the accepted answer or explanation on skip.
+- Skip is allowed: client submits `SKIP` through `submit_game_answer` (0 points) and advances immediately. Do not show the accepted answer or explanation. Do not increment the session wrong count.
 
 A client-supplied score is rejected. Direct `INSERT`/`UPDATE` on `games` / `game_answers` as anon is denied.
 
@@ -313,8 +313,8 @@ Share-a-score already exists on the results screen. A later pass should let a pl
 Intended shape (when we pick this up):
 
 - A “Share this puzzle” action on the **feedback** screen only (after submit or skip). Never before the answer is revealed — that would leak the puzzle without the pay-in.
-- A generated image card (same 16:9 rebus style): question image or prompt, the accepted answer, a one-line explanation, Tambua Kenya wordmark, and `tambua` play URL (category deep link if we have one).
-- Native `navigator.share` with the image file + text fallback (`Guessed NAROK on Tambua Kenya — your turn: {url}`). WhatsApp and Instagram pick up the image; clipboard fallback is text + URL.
+- A generated image card (same 16:9 rebus style): question image or prompt, the accepted answer, a one-line explanation, Unajua wordmark, and `unajua` play URL (category deep link if we have one).
+- Native `navigator.share` with the image file + text fallback (`Guessed NAROK on Unajua — your turn: {url}`). WhatsApp and Instagram pick up the image; clipboard fallback is text + URL.
 - Do not require an account. Do not put the next unanswered question on the card.
 - Track later, not now: share tap count is a vanity metric, not a launch blocker.
 
@@ -328,7 +328,7 @@ When the web game is complete:
 2. **Port** the player loop only: home/play equivalent, nickname, tiles, feedback, results, share, leaderboard.
 3. Call the same three RPCs: `start_game`, `submit_game_answer`, `complete_game`.
 4. Do not put answers, scoring, or game inserts in the mobile client.
-5. Guest nickname can stay device-local (same idea as `tambua_nickname`).
+5. Guest nickname can stay device-local (same idea as `unajua_nickname`).
 6. Web remains the content CMS and the SEO / share landing page.
 
 Suggested RN shape later: Expo + TypeScript, talking to the existing project URL + anon key. Not a second database.
@@ -364,7 +364,7 @@ Integrity migrations to preserve:
 
 | Doc | Role |
 |---|---|
-| [PRD](./Tambua%20—%20Product%20Requirements%20Document%20(PRD).md) | Vision, later markets, mobile-first original plan. Do not treat as the web MVP checklist. |
+| [PRD](./Unajua%20—%20Product%20Requirements%20Document%20(PRD).md) | Vision, later markets, mobile-first original plan. Do not treat as the web MVP checklist. |
 | [Rebus style](./rebus-puzzle-style.md) | How to draw rebus question images |
 
 When this spec and the PRD disagree about what to build **now**, this spec wins until the web game is complete.
