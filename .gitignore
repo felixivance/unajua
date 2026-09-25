@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# machine-local tooling config/cache
+.claude/launch.json
+.impeccable/hook.cache.json
