@@ -28,5 +28,5 @@ export default async function PlayPage({ params }: PlayPageProps) {
 
   if (!sample?.length) notFound();
 
-  return <GameContainer categoryId={category.id} categoryName={category.name} />;
+  return <GameContainer categoryId={category.id} categoryName={category.name} categorySlug={categorySlug} />;
 }

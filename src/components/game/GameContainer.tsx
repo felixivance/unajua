@@ -14,9 +14,10 @@ import {
 type GameContainerProps = {
   categoryId: string;
   categoryName: string;
+  categorySlug: string;
 };
 
-export function GameContainer({ categoryId, categoryName }: GameContainerProps) {
+export function GameContainer({ categoryId, categoryName, categorySlug }: GameContainerProps) {
   const [handle, setHandle] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [renaming, setRenaming] = useState(false);
@@ -83,6 +84,7 @@ export function GameContainer({ categoryId, categoryName }: GameContainerProps) 
       <GameScreen
         gameId={session.gameId}
         categoryName={categoryName}
+        categorySlug={categorySlug}
         questions={session.questions}
         handle={handle}
       />

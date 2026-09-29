@@ -17,6 +17,7 @@ import type { AnsweredQuestion, PlayQuestion } from '@/types/game';
 type GameScreenProps = {
   gameId: string;
   categoryName: string;
+  categorySlug: string;
   questions: PlayQuestion[];
   handle: string;
 };
@@ -26,6 +27,7 @@ type Phase = 'question' | 'feedback' | 'results';
 export function GameScreen({
   gameId,
   categoryName,
+  categorySlug,
   questions,
   handle,
 }: GameScreenProps) {
@@ -114,6 +116,7 @@ export function GameScreen({
       <ResultsScreen
         gameId={gameId}
         categoryName={categoryName}
+        categorySlug={categorySlug}
         answers={answers}
         handle={handle}
       />
