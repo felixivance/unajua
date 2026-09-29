@@ -94,7 +94,24 @@ body {
   animation: game-tile-in 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+@keyframes podium-rise {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.podium-rise {
+  transform-origin: bottom;
+  animation: podium-rise 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .podium-rise {
+    animation: none;
+  }
   .game-pop,
   .game-shake,
   .game-tile-in {

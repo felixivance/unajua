@@ -39,10 +39,27 @@ export function storeNickname(nickname: string) {
   window.localStorage.setItem(STORAGE_KEY, nickname.trim().slice(0, 24));
 }
 
-export function getOrCreateHandle() {
-  const existing = getStoredNickname();
-  if (existing) return existing;
-  const next = generateHandle();
-  storeNickname(next);
-  return next;
+/** Random handle the server has not seen. `isFree` should claim it as a side effect. */
+export async function generateUniqueHandle(isFree: (handle: string) => Promise<boolean>) {
+  for (let i = 0; i < 5; i++) {
+    const handle = generateHandle();
+    if (await isFree(handle)) return handle;
+  }
+  for (let i = 0; i < 5; i++) {
+    const handle = `${generateHandle().slice(0, 19)} ${1000 + Math.floor(Math.random() * 9000)}`;
+    if (await isFree(handle)) return handle;
+  }
+  throw new Error("Could not find a free nickname.");
+}
+
+const TOKEN_KEY = "unajua_player_token";
+
+/** Random per-device id that owns this device's nickname claim. */
+export function getOrCreateToken() {
+  let token = window.localStorage.getItem(TOKEN_KEY);
+  if (!token) {
+    token = crypto.randomUUID();
+    window.localStorage.setItem(TOKEN_KEY, token);
+  }
+  return token;
 }

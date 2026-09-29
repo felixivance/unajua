@@ -2,9 +2,9 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { iconForCategory } from '@/lib/game/categoryIcons';
 import { Reveal } from '@/components/Reveal';
-
-const RANK_MEDALS = ['🥇', '🥈', '🥉'];
-const RANK_RING = ['ring-amber-300', 'ring-stone-300', 'ring-orange-300'];
+import { LeaderboardSection } from '@/components/leaderboard/LeaderboardSection';
+import { parsePeriod } from '@/lib/game/leaderboard';
+import { getBoard } from '@/lib/game/leaderboardData';
 
 const STEPS = [
   {
@@ -27,22 +27,20 @@ const STEPS = [
   },
 ];
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const sp = await searchParams;
   const supabase = await createClient();
 
   const [
-    { data: topGames },
     { data: categories },
     { data: activeQuestions },
     { count: gamesPlayed },
     { data: completedNicknames },
   ] = await Promise.all([
-    supabase
-      .from('games')
-      .select('id, score, total_questions, guest_nickname, categories(name)')
-      .not('completed_at', 'is', null)
-      .order('score', { ascending: false })
-      .limit(10),
     supabase
       .from('categories')
       .select('id, slug, name')
@@ -70,6 +68,10 @@ export default async function Home() {
     (category) => (questionCounts.get(category.id) ?? 0) > 0,
   );
   const totalQuestions = activeQuestions?.length ?? 0;
+  const period = parsePeriod(sp.period);
+  const boardCategory =
+    playableCategories.find((c) => c.slug === sp.category)?.slug ?? null;
+  const boardRows = await getBoard(period, boardCategory);
   // ponytail: distinct on first 1000 completed rows; SQL count(distinct) if this grows
   const playerCount = new Set(
     (completedNicknames ?? [])
@@ -209,69 +211,19 @@ export default async function Home() {
         </Reveal>
       )}
 
-      {/* Leaderboard: clean ranked list on a neutral band */}
+      {/* Leaderboard: podium + period/category controls on a neutral band */}
       <Reveal>
         <section className="bg-stone-100 py-16 sm:py-20">
           <div className="mx-auto max-w-5xl px-4 sm:px-6">
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-2xl font-extrabold text-stone-900">
-                Top 10
-              </h2>
-              <span className="text-sm font-semibold text-stone-500">
-                {gamesPlayed ?? 0} games · {playerCount} players
-              </span>
-            </div>
-
-            <div className="flex flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-              {topGames?.length ? (
-                topGames.map((game, i) => (
-                  <div
-                    key={game.id}
-                    className={`flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-stone-50 ${
-                      i < topGames.length - 1 ? 'border-b border-stone-100' : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <span
-                        className={`grid h-9 w-9 place-items-center rounded-full text-sm font-extrabold ${
-                          i < 3
-                            ? `bg-white text-stone-900 ring-2 ${RANK_RING[i]}`
-                            : 'bg-stone-100 text-stone-500'
-                        }`}
-                      >
-                        {RANK_MEDALS[i] ?? `#${i + 1}`}
-                      </span>
-                      <div>
-                        <div className="font-semibold text-stone-900">
-                          {game.guest_nickname ?? 'Anonymous'}
-                        </div>
-                        <div className="text-xs text-stone-500">
-                          {
-                            (
-                              game.categories as unknown as {
-                                name: string;
-                              } | null
-                            )?.name
-                          }
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-extrabold text-emerald-700">
-                        {game.score} pts
-                      </div>
-                      <div className="text-xs text-stone-400">
-                        {game.total_questions} questions
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="px-6 py-10 text-center text-stone-500">
-                  No scores yet. Be the first on the board.
-                </div>
-              )}
-            </div>
+            <LeaderboardSection
+              rows={boardRows}
+              period={period}
+              category={boardCategory}
+              categories={playableCategories}
+              basePath="/"
+              limit={3}
+              summary={`${gamesPlayed ?? 0} games · ${playerCount} players`}
+            />
           </div>
         </section>
       </Reveal>

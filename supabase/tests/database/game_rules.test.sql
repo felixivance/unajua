@@ -43,11 +43,11 @@ select throws_ok(
 -- AC-4: start a game as anon, keep its id for later steps.
 select set_config('t.game', (
   select game_id::text
-  from start_game('00000000-0000-0000-0000-00000000c001', 'Tester') limit 1), true);
+  from start_game('00000000-0000-0000-0000-00000000c001', 'Tester', '00000000-0000-0000-0000-0000000000e1') limit 1), true);
 select ok(current_setting('t.game') <> '', 'AC-3: anon can start_game');
 
 select is(
-  (select count(*)::int from start_game('00000000-0000-0000-0000-00000000c001', 'Tester')
+  (select count(*)::int from start_game('00000000-0000-0000-0000-00000000c001', 'Tester', '00000000-0000-0000-0000-0000000000e1')
    where answer_length = 5 and cardinality(letter_tiles) = 9),
   1, 'AC-4: "M-Pesa" deals 5 letters + 4 decoys and exposes only its length');
 
