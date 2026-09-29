@@ -1,20 +1,20 @@
-import Link from 'next/link';
-import type { BoardCategory, BoardRow } from '@/lib/game/leaderboardData';
-import type { Period } from '@/lib/game/leaderboard';
-import { MyRank } from './MyRank';
-import { ResetsIn, TimeAgo } from './LiveText';
+import Link from "next/link";
+import type { BoardCategory, BoardRow } from "@/lib/game/leaderboardData";
+import type { Period } from "@/lib/game/leaderboard";
+import { MyRank } from "./MyRank";
+import { ResetsIn, TimeAgo } from "./LiveText";
 
 const PERIODS: { value: Period; label: string }[] = [
-  { value: 'day', label: 'Today' },
-  { value: 'week', label: 'This week' },
-  { value: 'all', label: 'All-time' },
+  { value: "day", label: "Today" },
+  { value: "week", label: "This week" },
+  { value: "all", label: "All-time" },
 ];
-const MEDALS = ['🥇', '🥈', '🥉'];
-const PLACES = ['1st', '2nd', '3rd'];
+const MEDALS = ["🥇", "🥈", "🥉"];
+const PLACES = ["1st", "2nd", "3rd"];
 const STEPS = [
-  { height: 'h-36', color: 'bg-gradient-to-b from-amber-400 to-amber-600' },
-  { height: 'h-28', color: 'bg-gradient-to-b from-stone-400 to-stone-600' },
-  { height: 'h-24', color: 'bg-gradient-to-b from-orange-400 to-orange-700' },
+  { height: "h-36", color: "bg-gradient-to-b from-amber-400 to-amber-600" },
+  { height: "h-28", color: "bg-gradient-to-b from-stone-400 to-stone-600" },
+  { height: "h-24", color: "bg-gradient-to-b from-orange-400 to-orange-700" },
 ];
 
 type Props = {
@@ -30,15 +30,15 @@ type Props = {
 
 function href(basePath: string, period: Period, category: string | null) {
   const params = new URLSearchParams({ period });
-  if (category) params.set('category', category);
+  if (category) params.set("category", category);
   return `${basePath}?${params}#leaderboard`;
 }
 
 const pill = (active: boolean) =>
   `rounded-full px-4 py-1.5 text-sm font-semibold transition ${
     active
-      ? 'bg-stone-900 text-white'
-      : 'border border-stone-300 bg-white text-stone-700 hover:border-stone-500'
+      ? "bg-stone-900 text-white"
+      : "border border-stone-300 bg-white text-stone-700 hover:border-stone-500"
   }`;
 
 export function LeaderboardSection({
@@ -58,23 +58,23 @@ export function LeaderboardSection({
       <div className="flex flex-wrap items-end justify-between gap-2">
         <h2 className="text-2xl font-extrabold text-stone-900">Leaderboard</h2>
         <span className="text-sm font-semibold text-stone-500">
-          {period !== 'all' && <ResetsIn period={period} />}
-          {period !== 'all' && summary ? ' · ' : ''}
+          {period !== "all" && <ResetsIn period={period} />}
+          {period !== "all" && summary ? " · " : ""}
           {summary}
         </span>
       </div>
 
-      <div className="flex justify-between">
+      <div className="flex flex-wrap justify-between gap-2">
         <nav
           aria-label="Leaderboard category"
           className="flex snap-x gap-2 overflow-x-auto pb-1"
         >
-          {[{ slug: null, name: 'All' }, ...categories].map((c) => (
+          {[{ slug: null, name: "All" }, ...categories].map((c) => (
             <Link
-              key={c.slug ?? 'all'}
+              key={c.slug ?? "all"}
               href={href(basePath, period, c.slug)}
               scroll={false}
-              aria-current={c.slug === category ? 'page' : undefined}
+              aria-current={c.slug === category ? "page" : undefined}
               className={`shrink-0 ${pill(c.slug === category)}`}
             >
               {c.name}
@@ -87,7 +87,7 @@ export function LeaderboardSection({
               key={p.value}
               href={href(basePath, p.value, category)}
               scroll={false}
-              aria-current={p.value === period ? 'page' : undefined}
+              aria-current={p.value === period ? "page" : undefined}
               className={pill(p.value === period)}
             >
               {p.label}
@@ -96,11 +96,15 @@ export function LeaderboardSection({
         </nav>
       </div>
 
-      <MyRank period={period} category={category} />
+      <MyRank
+        key={`${period}-${category}`}
+        period={period}
+        category={category}
+      />
 
       {rows.length === 0 ? (
         <div className="rounded-2xl border border-stone-200 bg-white px-6 py-10 text-center text-stone-500">
-          No scores yet. Be the first on the board.{' '}
+          No scores yet. Be the first on the board.{" "}
           <Link
             href="/play"
             className="font-semibold text-emerald-700 underline"
@@ -110,25 +114,25 @@ export function LeaderboardSection({
         </div>
       ) : (
         <>
-          <ol className="grid grid-cols-3 items-end gap-2 sm:gap-4">
+          <ol
+            key={`${period}-${category}`}
+            className="grid grid-cols-3 items-end gap-2 sm:gap-4"
+          >
             {[1, 0, 2].map((i) => {
               const row = podium[i];
-              if (!row) return <li key={i} />;
+              if (!row) return <li key={i} aria-hidden />;
               const step = STEPS[i];
               return (
-                <li
-                  key={row.rank}
-                  className="flex min-w-0 flex-col items-center"
-                >
+                <li key={i} className="flex min-w-0 flex-col items-center">
                   <div
                     className="game-pop flex w-full min-w-0 flex-col items-center gap-0.5 pb-2 text-center"
                     style={{ animationDelay: `${300 + i * 120}ms` }}
                   >
                     <span
-                      className={`${i === 0 ? 'text-5xl' : 'text-4xl'}`}
+                      className={`${i === 0 ? "text-5xl" : "text-4xl"}`}
                       aria-hidden
                     >
-                      {i === 0 ? '👑' : MEDALS[i]}
+                      {i === 0 ? "👑" : MEDALS[i]}
                     </span>
                     <span className="sr-only">{PLACES[i]}</span>
                     <span className="w-full truncate text-sm font-bold text-stone-900">

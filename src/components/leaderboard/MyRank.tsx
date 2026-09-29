@@ -4,12 +4,23 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getStoredNickname } from "@/lib/game/nickname";
-import type { Period } from "@/lib/game/leaderboard";
+import { chaseText, type Period } from "@/lib/game/leaderboard";
 
-type Rank = { rank: number; score: number; next_nickname: string | null; next_score: number | null };
+type Rank = {
+  rank: number;
+  score: number;
+  next_nickname: string | null;
+  next_score: number | null;
+};
 
 // Per-player, so it is fetched in the browser and never cached with the public board.
-export function MyRank({ period, category }: { period: Period; category: string | null }) {
+export function MyRank({
+  period,
+  category,
+}: {
+  period: Period;
+  category: string | null;
+}) {
   const [state, setState] = useState<Rank | null | "loading">("loading");
 
   useEffect(() => {
@@ -17,7 +28,11 @@ export function MyRank({ period, category }: { period: Period; category: string 
     const nickname = getStoredNickname();
     const lookup = nickname
       ? createClient()
-          .rpc("get_player_rank", { p_period: period, p_category_slug: category, p_nickname: nickname })
+          .rpc("get_player_rank", {
+            p_period: period,
+            p_category_slug: category,
+            p_nickname: nickname,
+          })
           .then(({ data }) => ((data ?? []) as Rank[])[0] ?? null)
       : Promise.resolve(null);
     void lookup.then((rank) => {
@@ -38,15 +53,16 @@ export function MyRank({ period, category }: { period: Period; category: string 
           <span className="text-stone-300">
             {" · "}
             {state.score} pts
-            {state.next_nickname && state.next_score !== null
-              ? ` · ${state.next_score - state.score} pts behind ${state.next_nickname}`
-              : " · top of the board"}
+            {` · ${chaseText(state.score, state.next_nickname, state.next_score)}`}
           </span>
         </p>
       ) : (
         <p className="text-sm text-stone-300">Play a category to get ranked.</p>
       )}
-      <Link href="/play" className="text-sm font-bold text-emerald-300 hover:underline">
+      <Link
+        href="/play"
+        className="text-sm font-bold text-emerald-300 hover:underline"
+      >
         Play
       </Link>
     </div>
