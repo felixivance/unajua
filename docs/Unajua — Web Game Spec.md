@@ -57,7 +57,7 @@ Product name is **Unajua**. Package name: `unajua-app`.
 
 | Path | What it does |
 |---|---|
-| `/admin/login` | Sign in / sign up. Sign-up creates a profile; someone must then grant `is_admin`. |
+| `/admin/login` | Sign in only (no self sign-up; the owner provisions admins and grants `is_admin`). Failed attempts trigger a cooldown: [spec](./specs/admin-login-cooldown.md). |
 | `/admin` | Counts of categories and questions; sign out. |
 | `/admin/categories` | List, create (name / slug / description), toggle active. |
 | `/admin/questions` | List with prompt, answer, published/draft, thumbnail. |
