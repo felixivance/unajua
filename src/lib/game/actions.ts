@@ -54,14 +54,26 @@ function firstRow<T>(data: T[] | T | null): T | null {
   return Array.isArray(data) ? (data[0] ?? null) : data;
 }
 
+export async function claimNickname(nickname: string, token: string): Promise<boolean> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("claim_nickname", {
+    p_nickname: nickname,
+    p_token: token,
+  });
+  if (error) throw new Error(error.message);
+  return data === true;
+}
+
 export async function startGame(
   categoryId: string,
-  nickname: string
+  nickname: string,
+  token: string
 ): Promise<GameSession> {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("start_game", {
     p_category_id: categoryId,
     p_nickname: nickname,
+    p_token: token,
   });
 
   if (error) throw new Error(error.message);

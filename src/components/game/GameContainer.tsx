@@ -3,8 +3,13 @@
 import { useEffect, useState } from "react";
 import { GameScreen } from "./GameScreen";
 import { GameShell } from "./GameShell";
-import { startGame, type GameSession } from "@/lib/game/actions";
-import { getOrCreateHandle, storeNickname } from "@/lib/game/nickname";
+import { claimNickname, startGame, type GameSession } from "@/lib/game/actions";
+import {
+  generateUniqueHandle,
+  getOrCreateToken,
+  getStoredNickname,
+  storeNickname,
+} from "@/lib/game/nickname";
 
 type GameContainerProps = {
   categoryId: string;
@@ -19,17 +24,41 @@ export function GameContainer({ categoryId, categoryName }: GameContainerProps) 
   const [session, setSession] = useState<GameSession | null>(null);
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
+  const [renameError, setRenameError] = useState<string | null>(null);
 
   useEffect(() => {
-    const next = getOrCreateHandle();
-    setHandle(next);
-    setDraft(next);
-    setHydrated(true);
+    const token = getOrCreateToken();
+    const stored = getStoredNickname();
+    (async () => {
+      let next = stored;
+      try {
+        // Claim the stored name (older players never did); if it is taken, pick a fresh one.
+        if (!next || !(await claimNickname(next, token))) {
+          next = await generateUniqueHandle((h) => claimNickname(h, token));
+          storeNickname(next);
+        }
+      } catch {
+        // Offline or server error: keep what we have; start_game re-checks the claim.
+      }
+      setHandle(next);
+      setDraft(next ?? "");
+      setHydrated(true);
+    })();
   }, []);
 
-  function saveHandle(value: string) {
+  async function saveHandle(value: string) {
     const trimmed = value.trim().slice(0, 24);
     if (!trimmed) return;
+    setRenameError(null);
+    try {
+      if (!(await claimNickname(trimmed, getOrCreateToken()))) {
+        setRenameError("That nickname is taken");
+        return;
+      }
+    } catch (err) {
+      setRenameError(err instanceof Error ? err.message : "Could not save that name.");
+      return;
+    }
     storeNickname(trimmed);
     setHandle(trimmed);
     setDraft(trimmed);
@@ -41,7 +70,7 @@ export function GameContainer({ categoryId, categoryName }: GameContainerProps) 
     setStarting(true);
     setStartError(null);
     try {
-      const next = await startGame(categoryId, handle);
+      const next = await startGame(categoryId, handle, getOrCreateToken());
       setSession(next);
     } catch (err) {
       setStartError(err instanceof Error ? err.message : "Could not start the game.");
@@ -76,7 +105,7 @@ export function GameContainer({ categoryId, categoryName }: GameContainerProps) 
               className="flex flex-col gap-3"
               onSubmit={(e) => {
                 e.preventDefault();
-                saveHandle(draft);
+                void saveHandle(draft);
               }}
             >
               <label className="flex flex-col gap-1.5 text-left text-sm font-medium text-stone-800">
@@ -89,10 +118,16 @@ export function GameContainer({ categoryId, categoryName }: GameContainerProps) 
                   className="rounded-lg border border-stone-300 px-3 py-2.5 text-center text-lg font-semibold text-stone-900 outline-none placeholder:text-stone-500 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
                 />
               </label>
+              {renameError && (
+                <p role="alert" className="text-sm text-red-700">
+                  {renameError}
+                </p>
+              )}
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => {
+                    setRenameError(null);
                     setDraft(handle ?? "");
                     setRenaming(false);
                   }}
