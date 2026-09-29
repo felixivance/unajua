@@ -26,6 +26,8 @@ type Props = {
   /** 3 = podium only (home); 10 = podium plus ranks 4-10. */
   limit: 3 | 10;
   summary?: string;
+  /** Pages that already have a hero heading turn this off. */
+  showTitle?: boolean;
 };
 
 function href(basePath: string, period: Period, category: string | null) {
@@ -49,6 +51,7 @@ export function LeaderboardSection({
   basePath,
   limit,
   summary,
+  showTitle = true,
 }: Readonly<Props>) {
   const podium = rows.slice(0, 3);
   const rest = limit === 10 ? rows.slice(3, 10) : [];
@@ -56,7 +59,13 @@ export function LeaderboardSection({
   return (
     <div id="leaderboard" className="flex scroll-mt-6 flex-col gap-5">
       <div className="flex flex-wrap items-end justify-between gap-2">
-        <h2 className="text-2xl font-extrabold text-stone-900">Leaderboard</h2>
+        {showTitle ? (
+          <h2 className="text-2xl font-extrabold text-stone-900">
+            Leaderboard
+          </h2>
+        ) : (
+          <span />
+        )}
         <span className="text-sm font-semibold text-stone-500">
           {period !== "all" && <ResetsIn period={period} />}
           {period !== "all" && summary ? " · " : ""}
@@ -180,7 +189,11 @@ export function LeaderboardSection({
                         {row.nickname}
                       </div>
                       <div className="text-xs text-stone-400">
-                        <TimeAgo at={row.reached_at} />
+                        <TimeAgo at={row.reached_at} /> ·{" "}
+                        {row.categories_played}{" "}
+                        {row.categories_played === 1
+                          ? "category"
+                          : "categories"}
                       </div>
                     </div>
                   </div>
