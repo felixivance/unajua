@@ -20,7 +20,11 @@ function useNow(intervalMs: number) {
 
 export function TimeAgo({ at }: { at: string }) {
   const now = useNow(5000);
-  return <time dateTime={at}>{now === null ? "" : timeAgo(Date.parse(at), now)}</time>;
+  return (
+    <time dateTime={at}>
+      {now === null ? "" : timeAgo(Date.parse(at), now)}
+    </time>
+  );
 }
 
 export function ResetsIn({ period }: { period: "day" | "week" }) {

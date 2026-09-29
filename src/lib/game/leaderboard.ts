@@ -13,6 +13,18 @@ export function parsePeriod(value: unknown): Period {
   return value === "day" || value === "week" ? value : "all";
 }
 
+export function chaseText(
+  score: number,
+  nextNickname: string | null,
+  nextScore: number | null,
+) {
+  if (nextNickname === null || nextScore === null) return "top of the board";
+  const gap = nextScore - score;
+  return gap > 0
+    ? `${gap} pts behind ${nextNickname}`
+    : `tied with ${nextNickname}, who got there first`;
+}
+
 export function timeAgo(playedAt: number, now: number) {
   const ms = now - playedAt;
   if (ms < 5 * SEC) return "just now";
@@ -31,8 +43,10 @@ export function nextReset(period: "day" | "week", now: number) {
 }
 
 export function formatCountdown(ms: number) {
-  if (ms >= DAY) return `${Math.floor(ms / DAY)}d ${Math.floor((ms % DAY) / HOUR)}h`;
-  if (ms >= HOUR) return `${Math.floor(ms / HOUR)}h ${Math.floor((ms % HOUR) / MIN)}m`;
+  if (ms >= DAY)
+    return `${Math.floor(ms / DAY)}d ${Math.floor((ms % DAY) / HOUR)}h`;
+  if (ms >= HOUR)
+    return `${Math.floor(ms / HOUR)}h ${Math.floor((ms % HOUR) / MIN)}m`;
   if (ms >= MIN) return `${Math.floor(ms / MIN)}m`;
   return "<1m";
 }

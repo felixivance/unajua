@@ -1,6 +1,6 @@
 // Spec: docs/specs/leaderboards.md (AC numbers in test names)
 import { describe, expect, test } from "vitest";
-import { formatCountdown, nextReset, timeAgo } from "@/lib/game/leaderboard";
+import { chaseText, formatCountdown, nextReset, timeAgo } from "@/lib/game/leaderboard";
 
 const SEC = 1000;
 const MIN = 60 * SEC;
@@ -66,6 +66,18 @@ describe("nextReset week (AC-22)", () => {
   test("exactly Monday 00:00 belongs to the new week", () => {
     const now = nairobi(2026, 10, 5);
     expect(nextReset("week", now)).toBe(nairobi(2026, 10, 12));
+  });
+});
+
+describe("chaseText (AC-19)", () => {
+  test("gap to the player above", () => {
+    expect(chaseText(700, "Kip", 900)).toBe("200 pts behind Kip");
+  });
+  test("a tie is not '0 pts behind'", () => {
+    expect(chaseText(1000, "Sexy Panda", 1000)).toBe("tied with Sexy Panda, who got there first");
+  });
+  test("rank 1", () => {
+    expect(chaseText(1000, null, null)).toBe("top of the board");
   });
 });
 
