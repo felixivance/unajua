@@ -4,12 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-
-// ponytail: client-side only, bypassable by a direct API call — real
-// brute-force protection is Supabase's server-side rate limit. This just
-// stops a careless retry loop/script from hammering the form.
-const MAX_ATTEMPTS_BEFORE_COOLDOWN = 3;
-const COOLDOWN_SECONDS = 15;
+import { registerFailure, secondsLeft as getSecondsLeft } from "@/lib/admin/loginCooldown";
 
 export function AdminLoginForm({ notAdminError }: { notAdminError: boolean }) {
   const router = useRouter();
@@ -22,7 +17,7 @@ export function AdminLoginForm({ notAdminError }: { notAdminError: boolean }) {
   const [lockedUntil, setLockedUntil] = useState(0);
   const [now, setNow] = useState(() => Date.now());
 
-  const secondsLeft = Math.max(0, Math.ceil((lockedUntil - now) / 1000));
+  const secondsLeft = getSecondsLeft(lockedUntil, now);
   const isLocked = secondsLeft > 0;
 
   useEffect(() => {
@@ -42,11 +37,10 @@ export function AdminLoginForm({ notAdminError }: { notAdminError: boolean }) {
     if (error) {
       setError(error.message);
       setLoading(false);
-      const nextFailCount = failCount + 1;
-      setFailCount(nextFailCount);
-      if (nextFailCount >= MAX_ATTEMPTS_BEFORE_COOLDOWN) {
-        setFailCount(0);
-        setLockedUntil(Date.now() + COOLDOWN_SECONDS * 1000);
+      const next = registerFailure(failCount, Date.now());
+      setFailCount(next.failCount);
+      if (next.lockedUntil) {
+        setLockedUntil(next.lockedUntil);
         setNow(Date.now());
       }
       return;
