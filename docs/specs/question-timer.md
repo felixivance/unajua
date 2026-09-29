@@ -1,6 +1,6 @@
 # Question timer with countdown progress bar
 
-**Status:** Draft. Needs CTO / senior sign-off on the open questions before tests are written.
+**Status:** Agreed (CTO approved the proposals below). Tests in `__tests__/unit/lib/game/questionTimer.test.ts`.
 **Layer:** client only (`GameScreen`). No migration, no RPC change.
 **Supersedes:** "No timer" in `docs/Unajua — Web Game Spec.md` (non-goals) and the "Ten questions. No clock." copy in `GameContainer`.
 
@@ -22,7 +22,7 @@ Puzzles currently have no time pressure. A per-question clock adds tension and k
 - **AC-10** Start screen copy changes from "No clock" to "60 seconds per question".
 - **AC-11** Out of scope: server-side enforcement of the limit, storing `time_taken_ms`, speed bonus, pause/resume, per-difficulty limits, persisting the clock across reloads. A player can cheat the client clock; scores are leaderboard-only for now.
 
-## Open questions (decide before coding)
+## Decisions (agreed)
 
 1. Does a timeout count as "wrong" in the right/wrong tally, or as a skip? Proposed: skip (matches AC-5, and the existing tally already excludes `SKIP`).
 2. Is 60s right for every difficulty? Proposed: yes for v1, tune from data.

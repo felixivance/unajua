@@ -204,7 +204,7 @@ type PlayQuestion = {
 - Correct: **100 points**
 - Incorrect: **0**
 - `difficulty` is stored but **does not change points yet**
-- No timer, no speed bonus, no hints
+- 60s per-question timer that auto-skips (see `docs/specs/question-timer.md`); no speed bonus, no hints
 - Skip is allowed: client submits `SKIP` through `submit_game_answer` (0 points) and advances immediately. Do not show the accepted answer or explanation. Do not increment the session wrong count.
 
 A client-supplied score is rejected. Direct `INSERT`/`UPDATE` on `games` / `game_answers` as anon is denied.
@@ -293,7 +293,7 @@ Optional polish that is still web-complete-adjacent:
 The PRD describes a much larger product. **Do not build these on the way to a working web game** (and do not require them before RN unless you explicitly promote them):
 
 - Player accounts, profiles, streaks, badges
-- Timers and speed scoring
+- Speed scoring
 - Hints, “almost there”
 - Daily challenge, friend vs friend, party mode
 - Audio / video questions

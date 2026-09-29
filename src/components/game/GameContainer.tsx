@@ -67,7 +67,7 @@ export function GameContainer({ categoryId, categoryName }: GameContainerProps) 
           <h1 className="text-4xl font-extrabold tracking-tight text-stone-900 text-balance">
             {categoryName}
           </h1>
-          <p className="text-stone-500">Ten questions. No clock. Your name hits the board.</p>
+          <p className="text-stone-500">Ten questions. 60 seconds each. Your name hits the board.</p>
         </div>
 
         <div className="game-pop w-full max-w-sm rounded-2xl border border-stone-200 bg-white px-5 py-4 shadow-[0_8px_24px_rgba(28,25,23,0.08)] [animation-delay:80ms]">

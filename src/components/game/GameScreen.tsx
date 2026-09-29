@@ -1,10 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LetterTiles } from "./LetterTiles";
 import { ResultsScreen } from "./ResultsScreen";
 import { GameShell } from "./GameShell";
 import { submitGameAnswer } from "@/lib/game/actions";
+import {
+  QUESTION_TIME_LIMIT_MS,
+  fractionLeft,
+  isExpired,
+  isUrgent,
+  secondsLeft,
+} from "@/lib/game/questionTimer";
 import type { AnsweredQuestion, PlayQuestion } from "@/types/game";
 
 type GameScreenProps = {
@@ -23,6 +30,9 @@ export function GameScreen({ gameId, categoryName, questions, handle }: GameScre
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [deadline, setDeadline] = useState(() => Date.now() + QUESTION_TIME_LIMIT_MS);
+  const [now, setNow] = useState(() => Date.now());
+
   const question = questions[index];
   const answered = answers.length;
   const right = answers.filter((a) => a.isCorrect).length;
@@ -32,6 +42,7 @@ export function GameScreen({ gameId, categoryName, questions, handle }: GameScre
   async function handleSubmit(submitted: string) {
     setBusy(true);
     setError(null);
+    const startedAt = Date.now();
     try {
       const result = await submitGameAnswer(gameId, question.id, submitted);
       setAnswers((prev) => [
@@ -47,16 +58,14 @@ export function GameScreen({ gameId, categoryName, questions, handle }: GameScre
         },
       ]);
       if (submitted === "SKIP") {
-        if (index + 1 >= questions.length) setPhase("results");
-        else {
-          setIndex((prev) => prev + 1);
-          setPhase("question");
-        }
+        handleNext();
       } else {
         setPhase("feedback");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not check that answer.");
+      // AC-4: in-flight time doesn't count; keep at least 5s so a failed auto-skip can't loop.
+      setDeadline((d) => Math.max(d + (Date.now() - startedAt), Date.now() + 5_000));
     } finally {
       setBusy(false);
     }
@@ -68,8 +77,24 @@ export function GameScreen({ gameId, categoryName, questions, handle }: GameScre
     } else {
       setIndex((prev) => prev + 1);
       setPhase("question");
+      setDeadline(Date.now() + QUESTION_TIME_LIMIT_MS);
+      setNow(Date.now());
     }
   }
+
+  const ticking = phase === "question" && !busy;
+
+  // AC-5/AC-6: only runs while not busy, so an in-flight answer wins.
+  useEffect(() => {
+    if (!ticking) return;
+    const id = setInterval(() => {
+      const t = Date.now();
+      setNow(t);
+      if (isExpired(deadline, t)) void handleSubmit("SKIP");
+    }, 250);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticking, deadline, index]);
 
   if (phase === "results") {
     return (
@@ -83,6 +108,7 @@ export function GameScreen({ gameId, categoryName, questions, handle }: GameScre
   }
 
   const lastAnswer = answers[answers.length - 1];
+  const secs = secondsLeft(deadline, now);
 
   return (
     <GameShell
@@ -111,6 +137,28 @@ export function GameScreen({ gameId, categoryName, questions, handle }: GameScre
 
       {phase === "question" && (
         <div key={question.id} className="game-pop flex flex-col items-center gap-7">
+          <div className="flex w-full items-center gap-3">
+            <div
+              role="progressbar"
+              aria-label="Time left"
+              aria-valuemin={0}
+              aria-valuemax={QUESTION_TIME_LIMIT_MS / 1000}
+              aria-valuenow={secs}
+              className="h-2 flex-1 overflow-hidden rounded-full bg-stone-200"
+            >
+              <div
+                className={`h-full ${isUrgent(secs) ? "bg-red-600" : "bg-emerald-700"}`}
+                style={{ width: `${fractionLeft(deadline, now) * 100}%` }}
+              />
+            </div>
+            <span
+              className={`w-9 text-right text-sm font-bold tabular-nums ${
+                isUrgent(secs) ? "text-red-600" : "text-stone-700"
+              }`}
+            >
+              {secs}s
+            </span>
+          </div>
           {question.image_url && (
             <div className="w-full overflow-hidden rounded-2xl border border-stone-200 bg-white p-4 shadow-[0_8px_24px_rgba(28,25,23,0.08)]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
