@@ -27,11 +27,16 @@ export function LetterTiles({ letters, answerLength, disabled, leading, trailing
     setSelected((prev) => [...prev, tile]);
   }
 
-  function removeLast() {
-    if (disabled || selected.length === 0) return;
-    const last = selected[selected.length - 1];
-    setSelected((prev) => prev.slice(0, -1));
-    setTiles((prev) => prev.map((t) => (t.id === last.id ? { ...t, used: false } : t)));
+  function removeTile(tile: Tile) {
+    if (disabled) return;
+    setSelected((prev) => prev.filter((t) => t.id !== tile.id));
+    setTiles((prev) => prev.map((t) => (t.id === tile.id ? { ...t, used: false } : t)));
+  }
+
+  function clearAll() {
+    if (disabled) return;
+    setSelected([]);
+    setTiles((prev) => prev.map((t) => ({ ...t, used: false })));
   }
 
   function submit() {
@@ -48,7 +53,8 @@ export function LetterTiles({ letters, answerLength, disabled, leading, trailing
             <button
               key={i}
               type="button"
-              onClick={removeLast}
+              onClick={() => tile && removeTile(tile)}
+              aria-label={tile ? `Remove ${tile.letter}` : undefined}
               disabled={!tile || disabled}
               className={`grid h-[42px] w-[42px] place-items-center rounded-lg border-2 text-xl font-extrabold transition-[transform,background-color,border-color] duration-150 [touch-action:manipulation] ${
                 tile
@@ -79,6 +85,20 @@ export function LetterTiles({ letters, answerLength, disabled, leading, trailing
 
       <div className="mt-auto flex w-full items-center gap-3 pt-2">
         {leading}
+        {selected.length > 0 && (
+          <button
+            type="button"
+            onClick={clearAll}
+            disabled={disabled}
+            aria-label="Clear answer"
+            className="game-tile-in grid h-11 w-11 shrink-0 place-items-center rounded-full border border-stone-300 bg-white text-stone-600 [touch-action:manipulation] hover:bg-stone-100 active:scale-95 disabled:opacity-50"
+          >
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1Z" />
+              <path d="m17 9-5 6m0-6 5 6" />
+            </svg>
+          </button>
+        )}
         <button
           type="button"
           onClick={submit}
