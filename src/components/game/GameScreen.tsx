@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { LetterTiles } from './LetterTiles';
 import { ResultsScreen } from './ResultsScreen';
 import { GameShell } from './GameShell';
+import { CountdownRing } from './CountdownRing';
 import { submitGameAnswer } from '@/lib/game/actions';
 import {
   QUESTION_TIME_LIMIT_MS,
@@ -57,6 +58,7 @@ export function GameScreen({
   const wrong = answers.filter(
     (a) => !a.isCorrect && a.submittedAnswer !== 'SKIP',
   ).length;
+  const skipped = answers.filter((a) => a.submittedAnswer === 'SKIP').length;
   const progress = questions.length ? (answered / questions.length) * 100 : 0;
 
   async function handleSubmit(submitted: string) {
@@ -136,23 +138,28 @@ export function GameScreen({
   const secs = secondsLeft(deadline, now);
 
   return (
-    <GameShell
-      trailing={
-        <span className="text-sm font-bold tabular-nums text-stone-700">
-          {Math.min(index + 1, questions.length)}/{questions.length}
-        </span>
-      }
-    >
-      <div className="mb-6">
-        <div className="mb-2 flex items-center justify-between gap-3 text-sm font-semibold">
-          <span className="text-stone-600">{categoryName}</span>
-          <span className="tabular-nums text-stone-500">
+    <GameShell>
+      <div className="mb-3">
+        <div className="mb-1.5 flex items-center justify-between gap-3 text-sm font-semibold">
+          <span className="truncate text-stone-600">
+            {categoryName}{' '}
+            <span className="tabular-nums text-stone-500">
+              · {Math.min(index + 1, questions.length)}/{questions.length}
+            </span>
+          </span>
+          <span className="shrink-0 tabular-nums text-stone-500">
             <span className="text-emerald-700">{right} right</span>
             <span className="mx-1.5 text-stone-300">·</span>
             <span className="text-red-600">{wrong} wrong</span>
+            {skipped > 0 && (
+              <>
+                <span className="mx-1.5 text-stone-300">·</span>
+                <span className="text-stone-500">{skipped} skipped</span>
+              </>
+            )}
           </span>
         </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-stone-200">
+        <div className="h-1 overflow-hidden rounded-full bg-stone-200">
           <div
             className="h-full bg-emerald-700 transition-[width] duration-300 ease-out motion-reduce:transition-none"
             style={{ width: `${progress}%` }}
@@ -163,42 +170,20 @@ export function GameScreen({
       {phase === 'question' && (
         <div
           key={question.id}
-          className="game-pop flex flex-col items-center gap-7"
+          className="game-pop flex flex-1 flex-col items-center gap-3"
         >
-          <div className="flex w-full items-center gap-3">
-            <div
-              role="progressbar"
-              aria-label="Time left"
-              aria-valuemin={0}
-              aria-valuemax={QUESTION_TIME_LIMIT_MS / 1000}
-              aria-valuenow={secs}
-              className="h-2 flex-1 overflow-hidden rounded-full bg-stone-200"
-            >
-              <div
-                className={`h-full ${isUrgent(secs) ? 'bg-red-600' : 'bg-emerald-700'}`}
-                style={{ width: `${fractionLeft(deadline, now) * 100}%` }}
-              />
-            </div>
-            <span
-              className={`w-9 text-right text-sm font-bold tabular-nums ${
-                isUrgent(secs) ? 'text-red-600' : 'text-stone-700'
-              }`}
-            >
-              {secs}s
-            </span>
-          </div>
           {question.image_url && (
-            <div className="w-full overflow-hidden rounded-2xl border border-stone-200 bg-white p-4 shadow-[0_8px_24px_rgba(28,25,23,0.08)]">
+            <div className="w-full overflow-hidden rounded-2xl border border-stone-200 bg-white p-2 shadow-[0_8px_24px_rgba(28,25,23,0.08)]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={question.image_url}
                 alt="Guess this"
-                className="mx-auto max-h-56 object-contain"
+                className="mx-auto max-h-[18dvh] object-contain"
               />
             </div>
           )}
 
-          <h1 className="text-center text-2xl font-extrabold tracking-tight text-stone-900 text-balance">
+          <h1 className="text-center text-xl font-extrabold tracking-tight text-stone-900 text-balance">
             {question.prompt}
           </h1>
 
@@ -208,25 +193,35 @@ export function GameScreen({
             answerLength={question.answer_length}
             disabled={busy}
             onSubmit={handleSubmit}
+            leading={
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void handleSubmit('SKIP')}
+                className="min-h-11 px-1 text-sm font-semibold text-stone-500 underline disabled:opacity-50"
+              >
+                Skip
+              </button>
+            }
+            trailing={
+              <CountdownRing
+                secs={secs}
+                fraction={fractionLeft(deadline, now)}
+                urgent={isUrgent(secs)}
+                maxSecs={QUESTION_TIME_LIMIT_MS / 1000}
+              />
+            }
           />
           {error && (
             <p role="alert" className="text-sm text-red-700">
               {error}
             </p>
           )}
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void handleSubmit('SKIP')}
-            className="min-h-11 text-sm font-semibold text-stone-500 underline disabled:opacity-50"
-          >
-            Skip
-          </button>
         </div>
       )}
 
       {phase === 'feedback' && lastAnswer && (
-        <div className="flex flex-col items-center gap-5 text-center">
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
           <div
             className={`text-4xl font-extrabold tracking-tight ${
               lastAnswer.isCorrect
@@ -244,7 +239,7 @@ export function GameScreen({
             {lastAnswer.acceptedAnswer}
           </div>
           {lastAnswer.explanation && (
-            <div className="w-full max-w-sm rounded-2xl bg-amber-50 px-5 py-4 text-left text-sm text-amber-950 tracking-wider">
+            <div className="max-h-[32dvh] w-full max-w-sm overflow-y-auto rounded-2xl bg-amber-50 px-5 py-4 text-left text-sm text-amber-950 tracking-wider">
               <span className="font-semibold">Did you know? </span>
               {lastAnswer.explanation}
               {lastAnswer.sourceName && (
