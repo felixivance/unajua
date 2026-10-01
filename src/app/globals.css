@@ -82,6 +82,23 @@ body {
   }
 }
 
+.game-ring {
+  transition: stroke-dashoffset 260ms linear, stroke 300ms ease;
+}
+
+@keyframes game-tick {
+  0% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.game-tick {
+  animation: game-tick 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 .game-pop {
   animation: game-pop 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -134,8 +151,12 @@ body {
   }
   .game-pop,
   .game-shake,
+  .game-tick,
   .game-tile-in {
     animation: none;
     filter: none;
+  }
+  .game-ring {
+    transition: none;
   }
 }
