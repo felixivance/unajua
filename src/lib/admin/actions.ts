@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeAnswer, slugify } from "@/lib/admin/slug";
+import { hasMissingImage } from "@/lib/game/questionImage";
 
 export type ActionState = { error?: string; ok?: boolean };
 
@@ -52,10 +53,15 @@ function questionFields(formData: FormData) {
   if (!letters) {
     return { error: "Answer needs at least one letter or number." } as const;
   }
+  const prompt = String(formData.get("prompt") ?? "").trim();
+  const image_url = String(formData.get("image_url") ?? "").trim() || null;
+  if (hasMissingImage({ prompt, image_url })) {
+    return { error: "This prompt refers to a picture. Upload an image or reword it." } as const;
+  }
   return {
     category_id: String(formData.get("category_id")),
-    prompt: String(formData.get("prompt") ?? "").trim(),
-    image_url: String(formData.get("image_url") ?? "").trim() || null,
+    prompt,
+    image_url,
     accepted_answer: accepted,
     alternative_answers: parseAlternatives(formData.get("alternative_answers")),
     explanation: String(formData.get("explanation") ?? "").trim() || null,
