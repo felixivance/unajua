@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import type { PlayQuestion } from "@/types/game";
+import { toResumed, type ResumeRow, type ResumedGame } from "@/lib/game/resume";
 
 export type AnswerCheck = {
   isCorrect: boolean;
@@ -93,6 +94,20 @@ export async function startGame(
       answer_length: row.answer_length,
     })),
   };
+}
+
+/** Rebuilds an in-progress game from the server; null if it is gone, finished, expired or not ours. */
+export async function resumeGame(
+  gameId: string,
+  token: string
+): Promise<ResumedGame | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("resume_game", {
+    p_game_id: gameId,
+    p_token: token,
+  });
+  if (error) throw new Error(error.message);
+  return toResumed((data ?? []) as ResumeRow[]);
 }
 
 export async function submitGameAnswer(

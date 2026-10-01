@@ -20,6 +20,9 @@ type GameScreenProps = {
   categorySlug: string;
   questions: PlayQuestion[];
   handle: string;
+  /** Set when resuming after a refresh (docs/specs/resume-game.md). */
+  initialAnswers?: AnsweredQuestion[];
+  initialRemainingMs?: number;
 };
 
 type Phase = 'question' | 'feedback' | 'results';
@@ -30,15 +33,21 @@ export function GameScreen({
   categorySlug,
   questions,
   handle,
+  initialAnswers = [],
+  initialRemainingMs = QUESTION_TIME_LIMIT_MS,
 }: GameScreenProps) {
-  const [index, setIndex] = useState(0);
-  const [phase, setPhase] = useState<Phase>('question');
-  const [answers, setAnswers] = useState<AnsweredQuestion[]>([]);
+  const [index, setIndex] = useState(
+    Math.min(initialAnswers.length, questions.length - 1),
+  );
+  const [phase, setPhase] = useState<Phase>(
+    initialAnswers.length >= questions.length ? 'results' : 'question',
+  );
+  const [answers, setAnswers] = useState<AnsweredQuestion[]>(initialAnswers);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [deadline, setDeadline] = useState(
-    () => Date.now() + QUESTION_TIME_LIMIT_MS,
+    () => Date.now() + initialRemainingMs,
   );
   const [now, setNow] = useState(() => Date.now());
 

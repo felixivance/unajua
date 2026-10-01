@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { GameScreen } from "./GameScreen";
 import Link from "next/link";
 import { iconForCategory } from "@/lib/game/categoryIcons";
-import { claimNickname, startGame, type GameSession } from "@/lib/game/actions";
+import { claimNickname, resumeGame, startGame, type GameSession } from "@/lib/game/actions";
+import type { ResumedGame } from "@/lib/game/resume";
+import { clearGameId, loadGameId, saveGameId } from "@/lib/game/resume";
 import {
   generateUniqueHandle,
   getOrCreateToken,
@@ -31,7 +33,7 @@ export function GameContainer({
   const [draft, setDraft] = useState("");
   const [renaming, setRenaming] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  const [session, setSession] = useState<GameSession | null>(null);
+  const [session, setSession] = useState<GameSession | ResumedGame | null>(null);
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
   const [renameError, setRenameError] = useState<string | null>(null);
@@ -52,9 +54,21 @@ export function GameContainer({
       }
       setHandle(next);
       setDraft(next ?? "");
-      setHydrated(true);
+
+      // Pick up an in-progress game; the server decides if it is still valid.
+      const savedId = loadGameId(categorySlug);
+      if (savedId && next) {
+        try {
+          const resumed = await resumeGame(savedId, token);
+          if (resumed) setSession(resumed);
+          else clearGameId(categorySlug);
+        } catch {
+          // Offline: leave the saved id for the next load.
+        }
+      }
+      setHydrated(true); // after resume, so Start can't race a restored game
     })();
-  }, []);
+  }, [categorySlug]);
 
   async function saveHandle(value: string) {
     const trimmed = value.trim().slice(0, 24);
@@ -83,6 +97,7 @@ export function GameContainer({
     setStartError(null);
     try {
       const next = await startGame(categoryId, handle, getOrCreateToken());
+      saveGameId(categorySlug, next.gameId);
       setSession(next);
     } catch (err) {
       setStartError(
@@ -99,6 +114,8 @@ export function GameContainer({
         categoryName={categoryName}
         categorySlug={categorySlug}
         questions={session.questions}
+        initialAnswers={"answers" in session ? session.answers : undefined}
+        initialRemainingMs={"remainingMs" in session ? session.remainingMs : undefined}
         handle={handle}
       />
     );
